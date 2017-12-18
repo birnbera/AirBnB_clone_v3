@@ -56,39 +56,42 @@ class Place(BaseModel, Base):
                                  viewonly=False,
                                  backref="place_amenities")
     else:
-        city_id = ""
-        user_id = ""
-        name = ""
-        description = ""
-        number_rooms = 0
-        number_bathrooms = 0
-        max_guest = 0
-        price_by_night = 0
-        latitude = 0.0
-        longitude = 0.0
-        amenity_ids = []
 
-    def __init__(self, *args, **kwargs):
-        """initializes Place"""
-        super().__init__(*args, **kwargs)
+        def __init__(self, *args,
+                     city_id="", user_id="", name="", description="",
+                     number_rooms=0, number_bathrooms=0, max_guest=0,
+                     price_by_night=0, latitude=0.0, longitude=0.0,
+                     amenity_ids=[], **kwargs):
+            """initializes Place"""
+            self.city_id = city_id
+            self.user_id = user_id
+            self.name = name
+            self.description = description
+            self.number_rooms = number_rooms
+            self.number_bathrooms = number_bathrooms
+            self.max_guest = max_guest
+            self.price_by_night = price_by_night
+            self.latitude = latitude
+            self.longitude = longitude
+            self.amenity_ids = amenity_ids
+            super().__init__(*args, **kwargs)
 
-    @property
-    def reviews(self):
-        """attribute that returns list of Review instances"""
-        values_review = models.storage.all("Review").values()
-        list_review = []
-        for review in values_review:
-            if review.place_id == self.id:
-                list_review.append(review)
-        return list_review
+            @property
+            def reviews(self):
+                """attribute that returns list of Review instances"""
+                values_review = models.storage.all("Review").values()
+                list_review = []
+                for review in values_review:
+                    if review.place_id == self.id:
+                        list_review.append(review)
+                return list_review
 
-    if getenv('HBNB_TYPE_STORAGE') != 'db':
-        @property
-        def amenities(self):
-            """attribute that returns list of Amenity instances"""
-            values_amenity = models.storage.all("Amenity").values()
-            list_amenity = []
-            for amenity in values_amenity:
-                if amenity.place_id == self.id:
-                    list_amenity.append(amenity)
-            return list_amenity
+            @property
+            def amenities(self):
+                """attribute that returns list of Amenity instances"""
+                values_amenity = models.storage.all("Amenity").values()
+                list_amenity = []
+                for amenity in values_amenity:
+                    if amenity.place_id == self.id:
+                        list_amenity.append(amenity)
+                return list_amenity

@@ -22,10 +22,10 @@ class Review(BaseModel, Base):
                          ForeignKey('users.id'),
                          nullable=False)
     else:
-        text = ""
-        place_id = ""
-        user_id = ""
 
-    def __init__(self, *args, **kwargs):
-        """initializes Review"""
-        super().__init__(*args, **kwargs)
+        def __init__(self, *args, text="", place_id="", user_id="", **kwargs):
+            """initializes Review"""
+            self.text = text
+            self.place_id = place_id
+            self.user_id = user_id
+            super().__init__(*args, **kwargs)

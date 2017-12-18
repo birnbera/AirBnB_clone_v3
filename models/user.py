@@ -26,11 +26,12 @@ class User(BaseModel, Base):
                                backref="user",
                                cascade="all, delete-orphan")
     else:
-        email = ""
-        password = ""
-        first_name = ""
-        last_name = ""
 
-    def __init__(self, *args, **kwargs):
-        """initializes user"""
-        super().__init__(*args, **kwargs)
+        def __init__(self, *args, email="", password="",
+                     first_name="", last_name="", **kwargs):
+            """initializes user"""
+            self.email = email
+            self.password = password
+            self.first_name = first_name
+            self.last_name = last_name
+            super().__init__(*args, **kwargs)

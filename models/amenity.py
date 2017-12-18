@@ -14,9 +14,8 @@ class Amenity(BaseModel, Base):
         __tablename__ = 'amenities'
         name = Column(String(128),
                       nullable=False)
-    else:
-        name = ""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, name="", **kwargs):
         """initializes Amenity"""
+        self.name = name
         super().__init__(*args, **kwargs)

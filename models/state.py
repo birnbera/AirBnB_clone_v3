@@ -17,13 +17,12 @@ class State(BaseModel, Base):
         cities = relationship("City",
                               backref="states")
     else:
-        name = ""
 
-    def __init__(self, *args, **kwargs):
-        """initializes state"""
-        super().__init__(*args, **kwargs)
+        def __init__(self, *args, name="", **kwargs):
+            """initializes state"""
+            self.name = name
+            super().__init__(*args, **kwargs)
 
-    if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def cities(self):
             """fs getter attribute that returns City instances"""
