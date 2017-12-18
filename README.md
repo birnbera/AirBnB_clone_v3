@@ -160,6 +160,9 @@ No known bugs at this time.
 ## Authors
 
 ###### Version 2
+- Anoop Macharla - [Github](https://github.com/amacharla) / [Twitter](https://twitter.com/noop_lion)
+
+###### Version 2
 
 - Andrew Birnberg - [Github](https://github.com/birnbera) / [Twitter](https://twitter.com/birnbera)
 - Thomas Wang - [Github](https://github.com/thomaspwang) / [Twitter](https://twitter.com/outspokenasian)
