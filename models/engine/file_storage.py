@@ -71,10 +71,8 @@ class FileStorage:
 
     def get(self, cls, id):
         """Returns obj based on cls and id else None"""
-        obj = None
-        if type(cls) == str and type(id) == str:
-            obj = self.__objects.get(cls + '.' + id)
-        return obj
+        return self.__objects.get(cls + '.' + id) \
+                if type(cls) == str and type(id) == str else None
 
     def count(self, cls=None):
         """Count number of objects in storage or specific number of cls objects"""
