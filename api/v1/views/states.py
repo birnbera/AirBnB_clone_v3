@@ -21,7 +21,7 @@ def delete_state(id):
     """Return State object based off id else raise 404"""
     state = storage.get("State", id)
     if state:
-        storage.delete()
+        state.delete()
         storage.save()
         return jsonify({}), 200
     else:
