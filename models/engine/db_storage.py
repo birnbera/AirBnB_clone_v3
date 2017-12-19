@@ -76,7 +76,6 @@ class DBStorage:
             self.reload()
         if obj:
             self.__session.delete(obj)
-            self.save()
 
     def close(self):
         """Dispose of current session if active"""

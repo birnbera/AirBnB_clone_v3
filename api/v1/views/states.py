@@ -16,4 +16,13 @@ def state_by_id(id):
     state = storage.get("State", id)
     return jsonify(state.to_dict()) if state else abort(404)
 
-
+@app_views.route('/states/<id>', strict_slashes=False, methods=['DELETE'])
+def delete_state(id):
+    """Return State object based off id else raise 404"""
+    state = storage.get("State", id)
+    if state:
+        storage.delete()
+        storage.save()
+        return jsonify({}), 200
+    else:
+        abort(404)
