@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""API endpoint"""
+"""State API endpoint"""
 from flask import abort, jsonify
 from api.v1.views import app_views
 from models import storage
