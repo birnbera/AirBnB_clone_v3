@@ -68,10 +68,7 @@ def update_city(city_id):
     updates.pop("id", None)
     updates.pop("created_at", None)
     updates.pop("updated_at", None)
-    if "state_id" in updates:
-        state = storage.get("State", updates["state_id"])
-        if not state:
-            updates.pop("state_id")
+    updates.pop("state_id", None)
     for k, v  in updates.items():
         setattr(city, k, v)
     city.save()
