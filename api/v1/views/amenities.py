@@ -18,10 +18,10 @@ def add_amenity():
     """Add amenity to states"""
     data = request.get_json(silent=True)
     if not data:
-        return jsonify({'Error': "Not a JSON"}), 400
+        return jsonify({'error': "Not a JSON"}), 400
     name = data.get('name', None)
     if not name:
-        return jsonify({'Error': "Missing name"}), 400
+        return jsonify({'error': "Missing name"}), 400
 
     data.pop("id", None)
     data.pop("created_at", None)
@@ -50,7 +50,7 @@ def manipulate_amenity(amenity_id):
     if request.method == 'PUT':  # Update amenity
         data = request.get_json(silent=True)
         if not data:
-            return jsonify({'Error': "Not a JSON"}), 400
+            return jsonify({'error': "Not a JSON"}), 400
         # update attributes
         [setattr(amenity, key, value) for key, value in data.items()
          if key not in ["id", "created_at", "updated_at"]]
