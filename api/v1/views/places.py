@@ -21,7 +21,7 @@ def add_place(city_id):
     if not valid_city:
         abort(404)
 
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({'Error': "Not a JSON"}), 400
     user_id = data.get('user_id', None)
@@ -56,7 +56,7 @@ def manipulate_place(place_id):
         abort(404)
 
     if request.method == 'PUT': # Update place
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
             return jsonify({'Error': "Not a JSON"}), 400
 

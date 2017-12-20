@@ -14,7 +14,7 @@ def all_amenities():
 @app_views.route('/amenities', methods=['POST'])
 def add_amenity():
     """Add amenity to states"""
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({'Error': "Not a JSON"}), 400
     name = data.get('name', None)
@@ -45,7 +45,7 @@ def manipulate_amenity(amenity_id):
         abort(404)
 
     if request.method == 'PUT': # Update amenity
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
             return jsonify({'Error': "Not a JSON"}), 400
         # update attributes

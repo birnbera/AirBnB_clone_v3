@@ -14,7 +14,7 @@ def all_states():
 @app_views.route('/states', methods=['POST'])
 def add_state():
     """Add state to states"""
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({'Error': "Not a JSON"}), 400
     name = data.get('name', None)
@@ -45,7 +45,7 @@ def manipulate_state(state_id):
         abort(404)
 
     if request.method == 'PUT': # Update State
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
             return jsonify({'Error': "Not a JSON"}), 400
         # update attributes

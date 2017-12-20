@@ -37,7 +37,7 @@ def create_review(place_id):
     place = storage.get("Place", place_id)
     if not place:
         abort(404)
-    review = request.get_json()
+    review = request.get_json(silent=True)
     if not review:
         return jsonify(error="Not a JSON"), 400
     if "user_id" not in review:
@@ -62,7 +62,7 @@ def update_review(review_id):
     review = storage.get("Review", review_id)
     if not review:
         abort(404)
-    updates = request.get_json()
+    updates = request.get_json(silent=True)
     if not updates:
         return jsonify(error="Not a JSON")
     updates.pop("id", None)
