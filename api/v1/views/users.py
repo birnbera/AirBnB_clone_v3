@@ -5,11 +5,13 @@ from api.v1.views import app_views
 from models import storage
 from models.user import User
 
+
 @app_views.route("/users", methods=['GET'])
 def all_users():
     """Return list of all users"""
     users = storage.all("User")
     return jsonify([user.to_dict() for user in users.values()]), 200
+
 
 @app_views.route("/users/<user_id>", methods=['GET'])
 def get_user(user_id):
@@ -18,6 +20,7 @@ def get_user(user_id):
     if not user:
         abort(404)
     return jsonify(user.to_dict()), 200
+
 
 @app_views.route("/users/<user_id>", methods=['DELETE'])
 def delete_user(user_id):
@@ -28,6 +31,7 @@ def delete_user(user_id):
     user.delete()
     storage.save()
     return jsonify({}), 200
+
 
 @app_views.route("/users", methods=['POST'])
 def create_user():
@@ -45,6 +49,7 @@ def create_user():
     user = User(**user)
     user.save()
     return jsonify(user.to_dict()), 201
+
 
 @app_views.route("/users/<user_id>", methods=['PUT'])
 def update_user(user_id):

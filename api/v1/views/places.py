@@ -5,14 +5,16 @@ from api.v1.views import app_views
 from models import storage
 from models.place import Place
 
+
 @app_views.route('/cities/<city_id>/places')
 def all_places(city_id):
     """Return list of all places in respective to city"""
     all_places = storage.all("Place")
-    places = [place.to_dict() for place in all_places.values() \
-                if place.city_id == city_id]
+    places = [place.to_dict() for place in all_places.values()
+              if place.city_id == city_id]
 
     return jsonify(places) if len(places) else abort(404)
+
 
 @app_views.route('/cities/<city_id>/places', methods=['POST'])
 def add_place(city_id):
@@ -47,15 +49,16 @@ def add_place(city_id):
     place.save()
     return jsonify(place.to_dict()), 201
 
+
 @app_views.route('/places/<place_id>', methods=['GET', 'PUT', 'DELETE'])
 def manipulate_place(place_id):
     """GET/UPDATE/DELETE place object based off id else raise 400"""
 
-    place = storage.get("Place", place_id) # Get place
+    place = storage.get("Place", place_id)  # Get place
     if not place:
         abort(404)
 
-    if request.method == 'PUT': # Update place
+    if request.method == 'PUT':  # Update place
         data = request.get_json(silent=True)
         if not data:
             return jsonify({'Error': "Not a JSON"}), 400
@@ -70,9 +73,9 @@ def manipulate_place(place_id):
         [setattr(place, key, value) for key, value in data.items()]
         place.save()
 
-    if request.method == 'DELETE': # Delete place
+    if request.method == 'DELETE':  # Delete place
         place.delete()
         storage.save()
-        return jsonify({}), 200 # DELETE method
+        return jsonify({}), 200  # DELETE method
 
-    return jsonify(place.to_dict()), 200 # GET, PUT method
+    return jsonify(place.to_dict()), 200  # GET, PUT method

@@ -5,6 +5,7 @@ from api.v1.views import app_views
 from models import storage
 from models.review import Review
 
+
 @app_views.route("/places/<place_id>/reviews", methods=['GET'])
 def get_place_reviews(place_id):
     """Get all reviews associated with a place identified by place_id"""
@@ -13,6 +14,7 @@ def get_place_reviews(place_id):
         abort(404)
     return jsonify([rev.to_dict() for rev in place.reviews]), 200
 
+
 @app_views.route("/reviews/<review_id>", methods=['GET'])
 def get_review(review_id):
     """Get specific review identified by review_id"""
@@ -20,6 +22,7 @@ def get_review(review_id):
     if not review:
         abort(404)
     return jsonify(review.to_dict()), 200
+
 
 @app_views.route("/reviews/<review_id>", methods=['DELETE'])
 def delete_review(review_id):
@@ -30,6 +33,7 @@ def delete_review(review_id):
     review.delete()
     storage.save()
     return jsonify({}), 200
+
 
 @app_views.route("/places/<place_id>/reviews", methods=['POST'])
 def create_review(place_id):
@@ -55,6 +59,7 @@ def create_review(place_id):
     review = Review(place_id=place_id, user_id=user.id, **review)
     review.save()
     return jsonify(review.to_dict()), 201
+
 
 @app_views.route("/reviews/<review_id>", methods=['PUT'])
 def update_review(review_id):
