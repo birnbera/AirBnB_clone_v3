@@ -7,7 +7,7 @@ from os import getenv
 
 app = Flask('v1')
 app.register_blueprint(app_views)
-
+app.url_map.strict_slashes = False
 
 @app.errorhandler(404)
 def not_found(error):
