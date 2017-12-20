@@ -23,13 +23,13 @@ def add_place(city_id):
 
     data = request.get_json()
     if not data:
-        return jsonify({'Error': "Not a JSON"}), 400
+        return jsonify({'error': "Not a JSON"}), 400
     user_id = data.get('user_id', None)
     if not user_id:
-        return jsonify({'Error': "Missing user_id"}), 400
+        return jsonify({'error': "Missing user_id"}), 400
     name = data.get('name', None)
     if not name:
-        return jsonify({'Error': "Missing name"}), 400
+        return jsonify({'error': "Missing name"}), 400
 
     data.pop('id', None)
     data.pop('created_at', None)
@@ -58,7 +58,7 @@ def manipulate_place(place_id):
     if request.method == 'PUT': # Update place
         data = request.get_json()
         if not data:
-            return jsonify({'Error': "Not a JSON"}), 400
+            return jsonify({'error': "Not a JSON"}), 400
 
         data.pop('id', None)
         data.pop('created_at', None)

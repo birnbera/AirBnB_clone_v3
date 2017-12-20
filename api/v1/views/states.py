@@ -16,10 +16,10 @@ def add_state():
     """Add state to states"""
     data = request.get_json()
     if not data:
-        return jsonify({'Error': "Not a JSON"}), 400
+        return jsonify({'error': "Not a JSON"}), 400
     name = data.get('name', None)
     if not name:
-        return jsonify({'Error': "Missing name"}), 400
+        return jsonify({'error': "Missing name"}), 400
 
     # this State already exists. Just update State with new data
     for state in storage.all("State").values():
@@ -47,7 +47,7 @@ def manipulate_state(state_id):
     if request.method == 'PUT': # Update State
         data = request.get_json()
         if not data:
-            return jsonify({'Error': "Not a JSON"}), 400
+            return jsonify({'error': "Not a JSON"}), 400
         # update attributes
         [setattr(state, key, value) for key, value in data.items() \
                 if key not in ["id", "created_at", "updated_at"]]
