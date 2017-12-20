@@ -39,10 +39,18 @@ def create_city(state_id):
         return jsonify({"error": "Not a JSON"}), 400
     if 'name' not in city:
         return jsonify({"error": "Missing name"}), 400
-    if not storage.get("State", state_id):
+    state = storage.get("State", state_id)
+    if not state:
         abort(404)
     city.pop("state_id", None)
-    city = City(state_id=state_id, **city)
+    city.pop("id", None)
+    city.pop("created_at", None)
+    city.pop("updated_at", None)
+    if list(filter(lambda c: c.name == city.name, state.cities)):
+        for k, v in city.items():
+            setattr(city, k, v)
+    else:
+        city = City(state_id=state_id, **city)
     city.save()
     return jsonify(city.to_dict()), 201
 
@@ -55,10 +63,14 @@ def update_city(city_id):
     updates = request.get_json()
     if not updates:
         return jsonify({"error": "Not a JSON"}), 400
-    updates.pop('id', None)
-    updates.pop('created_at', None)
-    updates.pop('updated_at', None)
-    for k,v  in updates.items():
+    updates.pop("id", None)
+    updates.pop("created_at", None)
+    updates.pop("updated_at", None)
+    if "state_id" in updates:
+        state = storage.get("State", updates["state_id"])
+        if not state:
+            updates.pop("state_id")
+    for k, v  in updates.items():
         setattr(city, k, v)
     city.save()
     return jsonify(city.to_dict()), 200
