@@ -1,13 +1,16 @@
 #!/usr/bin/python3
 """Version 1 of the HBNB REST api"""
 from flask import Flask, jsonify
+from flask_cors import CORS
 from models import storage
 from api.v1.views import app_views
 from os import getenv
 
 app = Flask('v1')
 app.register_blueprint(app_views)
+CORS(app, resource="/*", origin="0.0.0.0")
 app.url_map.strict_slashes = False
+
 
 @app.errorhandler(404)
 def not_found(error):
