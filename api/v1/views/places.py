@@ -24,19 +24,20 @@ def add_place(city_id):
     data = request.get_json()
     if not data:
         return jsonify({'Error': "Not a JSON"}), 400
-
     user_id = data.get('user_id', None)
+    if not user_id:
+        return jsonify({'Error': "Missing user_id"}), 400
     name = data.get('name', None)
-    if not user_id and not name: # CHECK LOGIC
+    if not name:
         return jsonify({'Error': "Missing name"}), 400
 
     data.pop('id', None)
     data.pop('created_at', None)
     data.pop('updated_at', None)
-    data.append({'city_id': city_id})
+    data.update({'city_id': city_id})
 
     # this place already exists. Just update place with new data
-    for place in storage.all("place").values():
+    for place in storage.all("Place").values():
         if place.name == name and place.user_id == user_id:
             [setattr(place, key, value) for key, value in data.items()]
             place.save()
@@ -50,7 +51,7 @@ def add_place(city_id):
 def manipulate_place(place_id):
     """GET/UPDATE/DELETE place object based off id else raise 400"""
 
-    place = storage.get("place", place_id) # Get place
+    place = storage.get("Place", place_id) # Get place
     if not place:
         abort(404)
 
