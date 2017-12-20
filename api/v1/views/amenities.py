@@ -29,6 +29,10 @@ def add_amenity():
             amenity.save()
             return jsonify(amenity.to_dict()), 200
 
+    data.pop("id", None)
+    data.pop("created_at", None)
+    data.pop("updated_at", None)
+
     amenity = Amenity(**data)
     amenity.save()
     return jsonify(amenity.to_dict()), 201

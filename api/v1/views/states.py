@@ -28,6 +28,10 @@ def add_state():
             state.save()
             return jsonify(state.to_dict()), 200
 
+    data.pop("id", None)
+    data.pop("created_at", None)
+    data.pop("updated_at", None)
+
     state = State(**data)
     state.save()
     return jsonify(state.to_dict()), 201
