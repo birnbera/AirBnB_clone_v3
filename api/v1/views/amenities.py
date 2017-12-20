@@ -21,17 +21,16 @@ def add_amenity():
     if not name:
         return jsonify({'Error': "Missing name"}), 400
 
-    # this amenity already exists. Just update Amenity with new data
-    for amenity in storage.all("Amenity").values():
-        if amenity.name == name:
-            [setattr(amenity, key, value) for key, value in data.items() \
-                    if key not in ["id", "created_at", "updated_at"]]
-            amenity.save()
-            return jsonify(amenity.to_dict()), 200
-
     data.pop("id", None)
     data.pop("created_at", None)
     data.pop("updated_at", None)
+
+    # this amenity already exists. Just update Amenity with new data
+    for amenity in storage.all("Amenity").values():
+        if amenity.name == name:
+            [setattr(amenity, key, value) for key, value in data.items()]
+            amenity.save()
+            return jsonify(amenity.to_dict()), 200
 
     amenity = Amenity(**data)
     amenity.save()
