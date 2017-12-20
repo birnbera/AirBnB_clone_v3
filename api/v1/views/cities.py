@@ -5,15 +5,15 @@ from api.v1.views import app_views
 from models import storage
 from models.city import City
 
-@app_views.route('/states/<state_id>/cities')
+@app_views.route('/states/<state_id>/cities', strict_slashes=False)
 def all_cities(state_id):
     """Return list of all cities associated with a particular state"""
-    state = storage.all("State", state_id)
+    state = storage.get("State", state_id)
     if not state:
         abort(404)
     return jsonify([city.to_dict() for city in state.cities]), 200
 
-@app_views.route('/cities/<city_id>', strict_slashes=False)
+@app_views.route('/cities/<city_id>', strict_slashes=False, methods=['GET'])
 def city_by_id(city_id):
     """Return City object based off id else raise 404"""
     city = storage.get("City", city_id)
@@ -46,11 +46,13 @@ def create_city(state_id):
     city.pop("id", None)
     city.pop("created_at", None)
     city.pop("updated_at", None)
-    if list(filter(lambda c: c.name == city.name, state.cities)):
+    city_exists = list(filter(lambda c: c.name == city["name"], state.cities))
+    if city_exists:
         for k, v in city.items():
-            setattr(city, k, v)
-    else:
-        city = City(state_id=state_id, **city)
+            setattr(city_exists[0], k, v)
+        city_exists[0].save()
+        return jsonify(city_exists[0].to_dict()), 200
+    city = City(state_id=state_id, **city)
     city.save()
     return jsonify(city.to_dict()), 201
 
