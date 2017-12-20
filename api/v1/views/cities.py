@@ -5,39 +5,44 @@ from api.v1.views import app_views
 from models import storage
 from models.city import City
 
-@app_views.route('/cities', strict_slashes=False)
-def all_cities():
-    """Return list of all cities"""
-    all_cities = storage.all("City")
-    return jsonify([obj.to_dict() for obj in all_cities.values()])
-
-@app_views.route('/cities/<id>', strict_slashes=False)
-def city_by_id(id):
-    """Return City object based off id else raise 404"""
-    city = storage.get("City", id)
-    return jsonify(city.to_dict()) if city else abort(404)
-
-@app_views.route('/cities/<id>', strict_slashes=False, methods=['DELETE'])
-def delete_city(id):
-    """Return City object based off id else raise 404"""
-    city = storage.get("City", id)
-    if city:
-        storage.delete()
-        storage.save()
-        return jsonify({}), 200
-    else:
+@app_views.route('/states/<state_id>/cities')
+def all_cities(state_id):
+    """Return list of all cities associated with a particular state"""
+    state = storage.all("State", state_id)
+    if not state:
         abort(404)
+    return jsonify([city.to_dict() for city in state.cities]), 200
 
-@app_views.route('/cities', strict_slashes=False, methods=['POST'])
-def create_city():
+@app_views.route('/cities/<city_id>', strict_slashes=False)
+def city_by_id(city_id):
+    """Return City object based off id else raise 404"""
+    city = storage.get("City", city_id)
+    if not city:
+        abort(404)
+    return jsonify(city.to_dict()), 200
+
+@app_views.route('/cities/<city_id>', strict_slashes=False, methods=['DELETE'])
+def delete_city(city_id):
+    """Return City object based off id else raise 404"""
+    city = storage.get("City", city_id)
+    if not city:
+        abort(404)
+    city.delete()
+    storage.save()
+    return jsonify({}), 200
+
+@app_views.route('/states/<state_id>/cities', strict_slashes=False, methods=['POST'])
+def create_city(state_id):
     """Create new City object from request JSON else raise 400"""
     city = request.get_json()
     if not city:
         return jsonify({"error": "Not a JSON"}), 400
     if 'name' not in city:
         return jsonify({"error": "Missing name"}), 400
-    city = City(**city)
-    storage.new(city)
+    if not storage.get("State", state_id):
+        abort(404)
+    city.pop("state_id", None)
+    city = City(state_id=state_id, **city)
     city.save()
     return jsonify(city.to_dict()), 201
 
