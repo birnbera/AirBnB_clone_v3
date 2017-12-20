@@ -65,5 +65,3 @@ class BaseModel:
     def delete(self):
         """Delete current instance from storage by calling its delete method"""
         models.storage.delete(self)
-        #models.storage.save()  GOOD IDEA TO CALL SAVE HERE?
-

@@ -15,9 +15,9 @@ def all_states():
 def add_state():
     """Add state to states"""
     data = request.get_json()
-    name = data.get('name', None)
     if not data:
         return jsonify({'Error': "Not a JSON"}), 400
+    name = data.get('name', None)
     if not name:
         return jsonify({'Error': "Missing name"}), 400
 
