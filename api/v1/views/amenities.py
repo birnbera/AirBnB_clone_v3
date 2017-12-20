@@ -5,13 +5,13 @@ from api.v1.views import app_views
 from models import storage
 from models.amenity import Amenity
 
-@app_views.route('/amenities', strict_slashes=False)
+@app_views.route('/amenities')
 def all_amenities():
     """Return list of all amenities"""
     all_amenities = storage.all("Amenity")
     return jsonify([ obj.to_dict() for obj in all_amenities.values() ])
 
-@app_views.route('/amenities', strict_slashes=False, methods=['POST'])
+@app_views.route('/amenities', methods=['POST'])
 def add_amenity():
     """Add amenity to states"""
     data = request.get_json()
@@ -36,7 +36,7 @@ def add_amenity():
     amenity.save()
     return jsonify(amenity.to_dict()), 201
 
-@app_views.route('/amenities/<amenity_id>', strict_slashes=False, methods=['GET', 'PUT', 'DELETE'])
+@app_views.route('/amenities/<amenity_id>', methods=['GET', 'PUT', 'DELETE'])
 def manipulate_amenity(amenity_id):
     """GET/UPDATE/DELETE amenity object based off id else raise 400"""
 

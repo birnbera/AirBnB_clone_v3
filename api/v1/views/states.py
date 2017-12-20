@@ -5,13 +5,13 @@ from api.v1.views import app_views
 from models import storage
 from models.state import State
 
-@app_views.route('/states', strict_slashes=False)
+@app_views.route('/states')
 def all_states():
     """Return list of all states"""
     all_states = storage.all("State")
     return jsonify([ obj.to_dict() for obj in all_states.values() ])
 
-@app_views.route('/states', strict_slashes=False, methods=['POST'])
+@app_views.route('/states', methods=['POST'])
 def add_state():
     """Add state to states"""
     data = request.get_json()
@@ -36,7 +36,7 @@ def add_state():
     state.save()
     return jsonify(state.to_dict()), 201
 
-@app_views.route('/states/<state_id>', strict_slashes=False, methods=['GET', 'PUT', 'DELETE'])
+@app_views.route('/states/<state_id>', methods=['GET', 'PUT', 'DELETE'])
 def manipulate_state(state_id):
     """GET/UPDATE/DELETE State object based off id else raise 400"""
 

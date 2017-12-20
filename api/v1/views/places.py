@@ -5,7 +5,7 @@ from api.v1.views import app_views
 from models import storage
 from models.place import Place
 
-@app_views.route('/cities/<city_id>/places', strict_slashes=False)
+@app_views.route('/cities/<city_id>/places')
 def all_places(city_id):
     """Return list of all places in respective to city"""
     all_places = storage.all("Place")
@@ -14,7 +14,7 @@ def all_places(city_id):
 
     return jsonify(places) if len(places) else abort(404)
 
-@app_views.route('/cities/<city_id>/places', strict_slashes=False, methods=['POST'])
+@app_views.route('/cities/<city_id>/places', methods=['POST'])
 def add_place(city_id):
     """Add place based of city_id"""
     valid_city = storage.get("City", city_id)
@@ -47,7 +47,7 @@ def add_place(city_id):
     place.save()
     return jsonify(place.to_dict()), 201
 
-@app_views.route('/places/<place_id>', strict_slashes=False, methods=['GET', 'PUT', 'DELETE'])
+@app_views.route('/places/<place_id>', methods=['GET', 'PUT', 'DELETE'])
 def manipulate_place(place_id):
     """GET/UPDATE/DELETE place object based off id else raise 400"""
 
