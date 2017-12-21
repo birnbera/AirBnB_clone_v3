@@ -49,21 +49,33 @@ class FileStorage:
 
     def save(self):
         """serializes __objects to the JSON file (path: __file_path)"""
-        json_objects = {}
-        for key in self.__objects:
-            json_objects[key] = self.__objects[key].to_dict()
+        class MyEncoder(json.JSONEncoder):
+            def default(self, o):
+                try:
+                    return o.to_dict()
+                except AttributeError as e:
+                    print(e)
+                    return o
+
         with open(self.__file_path, 'w') as f:
-            json.dump(json_objects, f)
+            json.dump(self.__objects, f, cls=MyEncoder)
 
     def reload(self):
         """deserializes the JSON file to __objects"""
+        def object_hook(o):
+            if '__class__' in o:
+                oclass = o['__class__']
+                return classes[oclass](**o)
+            else:
+                return o
+
         try:
             with open(self.__file_path, 'r') as f:
-                jo = json.load(f)
-            for key in jo:
-                self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
+                self.__objects = json.load(f, object_hook=object_hook)
         except:
-            pass
+            self.__objects.clear()
+            raise
+
 
     def delete(self, obj=None):
         """delete obj from __objects if it’s inside"""

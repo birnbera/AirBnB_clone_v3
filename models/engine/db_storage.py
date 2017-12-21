@@ -3,7 +3,7 @@
 connection.
 """
 
-import os
+from os import getenv
 from models.base_model import Base
 from models.amenity import Amenity
 from models.city import City
@@ -30,13 +30,13 @@ class DBStorage:
 
     def __init__(self):
         """ creates connection to db"""
-        user = os.getenv('HBNB_MYSQL_USER')
-        passwd = os.getenv('HBNB_MYSQL_PWD')
-        host = os.getenv('HBNB_MYSQL_HOST')
-        database = os.getenv('HBNB_MYSQL_DB')
+        user = getenv('HBNB_MYSQL_USER')
+        passwd = getenv('HBNB_MYSQL_PWD')
+        host = getenv('HBNB_MYSQL_HOST')
+        database = getenv('HBNB_MYSQL_DB')
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(user, passwd, host, database))
-        if os.getenv('HBNB_ENV') == 'test':
+        if getenv('HBNB_ENV') == 'test':
             if database == 'hbnb_dev_db':
                 raise Exception("Using 'hbnb_dev_db' in 'test' mode. "
                                 "This will drop all tables. "
