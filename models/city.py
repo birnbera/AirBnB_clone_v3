@@ -1,12 +1,11 @@
 #!/usr/bin/python3
-""" holds class City"""
+"""Holds class City"""
 import models
-from models.base_model import BaseModel, Base
 from os import getenv
-import sqlalchemy
+from sqlalchemy import ForeignKey
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from sqlalchemy import ForeignKey
+from models.base_model import BaseModel, Base
 
 
 class City(BaseModel, Base):
@@ -22,6 +21,13 @@ class City(BaseModel, Base):
         places = relationship("Place",
                               backref="cities",
                               cascade="all, delete-orphan")
+    else:
+        @property
+        def places(self):
+            """Return all places associated with the current city"""
+            place_values = models.storage.all("Place").values()
+            return list(filter(lambda p: p.city_id == self.id,
+                               place_values))
 
     def __init__(self, *args, **kwargs):
         """initializes city"""

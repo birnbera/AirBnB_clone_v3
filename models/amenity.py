@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-""" holds class Amenity"""
-from models.base_model import BaseModel, Base
+"""Holds class Amenity"""
 import sqlalchemy
 from sqlalchemy import Column, String
+from models.base_model import BaseModel, Base
 
 
 class Amenity(BaseModel, Base):

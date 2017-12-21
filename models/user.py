@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-""" holds class User"""
+"""Holds class User"""
 import models
-from models.base_model import BaseModel, Base
 from os import getenv
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+from models.base_model import BaseModel, Base
 
 
 class User(BaseModel, Base):
@@ -30,9 +30,16 @@ class User(BaseModel, Base):
         @property
         def places(self):
             """Return list of places associated with the current user"""
-            place_values
-            
-        def reviews...
+            place_values = models.storage.all("Place").values()
+            return list(filter(lambda p: p.user_id = self.id,
+                               place_values))
+
+        @property
+        def reviews(self):
+            """Return list of reviews associated with the current user"""
+            review_values = models.storage.all("Review").values()
+            return list(filter(lambda r: r.user_id == self.id,
+                               review_values))
 
     def __init__(self, *args, **kwargs):
         """initializes user"""

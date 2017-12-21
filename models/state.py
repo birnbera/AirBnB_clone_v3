@@ -1,11 +1,10 @@
 #!/usr/bin/python3
-""" holds class State"""
+"""Holds class State"""
 import models
-from models.base_model import BaseModel, Base
 from os import getenv
-import sqlalchemy
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from models.base_model import BaseModel, Base
 
 
 class State(BaseModel, Base):
@@ -16,7 +15,7 @@ class State(BaseModel, Base):
 
     if getenv("HBNB_TYPE_STORAGE") == "db":
         cities = relationship("City",
-                              cascade="all, delete",
+                              cascade="all, delete-orphan",
                               backref="states")
     else:
         @property

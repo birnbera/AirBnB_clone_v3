@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-""" holds class Review"""
-from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String
+"""Holds class Review"""
 from sqlalchemy import ForeignKey
+from sqlalchemy import Column, String
+from models.base_model import BaseModel, Base
 
 
 class Review(BaseModel, Base):
