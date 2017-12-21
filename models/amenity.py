@@ -10,12 +10,11 @@ from sqlalchemy.orm import relationship
 
 class Amenity(BaseModel, Base):
     """Representation of Amenity """
-    if getenv('HBNB_TYPE_STORAGE') == 'db':
-        __tablename__ = 'amenities'
-        name = Column(String(128),
-                      nullable=False)
+    __tablename__ = 'amenities'
+    name = Column(String(128),
+                  nullable=False)
 
-    def __init__(self, *args, name="", **kwargs):
+    def __init__(self, *args, **kwargs):
         """initializes Amenity"""
-        self.name = name
+        self.name = kwargs.pop("name", "")
         super().__init__(*args, **kwargs)
