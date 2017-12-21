@@ -37,7 +37,12 @@ class DBStorage:
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(user, passwd, host, database))
         if os.getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.__engine)
+            if database == 'hbnb_dev_db':
+                raise Exception("Using 'hbnb_dev_db' in 'test' mode. "
+                                "This will drop all tables. "
+                                "Are you sure you want to do this?")
+            else:
+                Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """query on current db"""
@@ -82,10 +87,11 @@ class DBStorage:
         self.__session.remove()
 
     def get(self, cls, id):
-        """Retrieve object based on class name and its id, else None if not found"""
+        """Retrieve object based on class name and id, else None if not found"""
         cls = name2class.get(cls, None)
-        return self.__session.query(cls).filter(cls.id == id).first() if cls else None
+        return self.__session.query(cls).filter(cls.id == id).first() \
+            if cls else None
 
     def count(self, cls=None):
-        """Count number of objects in storage or specific number of cls objects"""
+        """Count number of objects in storage or number of type `cls`"""
         return len(self.all(cls))

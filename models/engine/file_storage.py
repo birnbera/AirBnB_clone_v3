@@ -12,13 +12,19 @@ from models.review import Review
 from models.state import State
 from models.user import User
 
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
+classes = {
+    "Amenity": Amenity,
+    "BaseModel": BaseModel,
+    "City": City,
+    "Place": Place,
+    "Review": Review,
+    "State": State,
+    "User": User
+}
 
 
 class FileStorage:
     """serializes instances to a JSON file & deserializes back to instances"""
-
     # string - path to the JSON file
     __file_path = "file.json"
     # dictionary - empty but will store all objects by <class name>.id
@@ -67,6 +73,7 @@ class FileStorage:
 
     def close(self):
         """Deserialize JSON file to objects"""
+        self.__objects.clear()
         self.reload()
 
     def get(self, cls, id):
@@ -75,5 +82,6 @@ class FileStorage:
                 if type(cls) == str and type(id) == str else None
 
     def count(self, cls=None):
-        """Count number of objects in storage or specific number of cls objects"""
+        """Count number of objects in storage or specific number
+        of cls objects"""
         return len(self.all(cls))
