@@ -14,8 +14,15 @@ from models.user import User
 import shlex  # for splitting the line along spaces except in double quotes
 import re
 
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
+classes = {
+    "Amenity": Amenity,
+    "BaseModel": BaseModel,
+    "City": City,
+    "Place": Place,
+    "Review": Review,
+    "State": State,
+    "User": User
+}
 
 
 class HBNBCommand(cmd.Cmd):
@@ -83,7 +90,6 @@ class HBNBCommand(cmd.Cmd):
         except Exception as e:
             print("** could not save [{}] object **".format(args[0]))
             print(e)
-            return False
         else:
             print(instance.id)
 
@@ -95,9 +101,9 @@ class HBNBCommand(cmd.Cmd):
             return False
         if args[0] in classes:
             if len(args) > 1:
-                key = args[0] + "." + args[1]
-                if key in models.storage.all():
-                    print(models.storage.all()[key])
+                obj = models.storage.get(args[0], args[1])
+                if obj:
+                    print(obj)
                 else:
                     print("** no instance found **")
             else:
@@ -112,9 +118,9 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         elif args[0] in classes:
             if len(args) > 1:
-                key = args[0] + "." + args[1]
-                if key in models.storage.all():
-                    models.storage.all().pop(key)
+                obj = models.storage.get(args[0], args[1])
+                if obj:
+                    obj.delete()
                     models.storage.save()
                 else:
                     print("** no instance found **")
@@ -130,14 +136,13 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 0:
             for value in models.storage.all().values():
                 obj_list.append(str(value))
+            print(obj_list)
         elif args[0] in classes:
-            for key in models.storage.all():
-                if key.startswith(args[0]):
-                    obj_list.append(str(models.storage.all()[key]))
+            for value in models.storage.all(args[0]).values():
+                obj_list.append(str(value))
+            print(obj_list)
         else:
             print("** class doesn't exist **")
-            return False
-        print(obj_list)
 
     def do_update(self, arg):
         """Update an instance based on the class name, id, attribute & value"""
@@ -149,8 +154,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         elif args[0] in classes:
             if len(args) > 1:
-                k = args[0] + "." + args[1]
-                if k in models.storage.all():
+                obj = models.storage.get(args[0], args[1])
+                if obj:
                     if len(args) > 2:
                         if len(args) > 3:
                             if args[0] == "Place":
@@ -164,8 +169,8 @@ class HBNBCommand(cmd.Cmd):
                                         args[3] = float(args[3])
                                     except:
                                         args[3] = 0.0
-                            setattr(models.storage.all()[k], args[2], args[3])
-                            models.storage.all()[k].save()
+                            setattr(obj, args[2], args[3])
+                            obj.save()
                         else:
                             print("** value missing **")
                     else:
