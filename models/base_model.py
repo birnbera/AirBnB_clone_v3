@@ -5,7 +5,8 @@ Contains class BaseModel
 
 from datetime import datetime
 import models
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String
+from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 import uuid
 from os import getenv
@@ -18,8 +19,10 @@ Base = declarative_base()
 class BaseModel:
     """The BaseModel class from which future classes will be derived"""
     id = Column(String(60), nullable=False, primary_key=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DATETIME(fsp=6), nullable=False,
+                        default=datetime.utcnow)
+    updated_at = Column(DATETIME(fsp=6), nullable=False,
+                        default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
         """Initialization of the base model"""
@@ -51,7 +54,6 @@ class BaseModel:
             new_dict["updated_at"] = new_dict["updated_at"].isoformat()
         new_dict["__class__"] = self.__class__.__name__
         new_dict.pop('_sa_instance_state', None)
-        new_dict.pop('__tablename__', None)
         return new_dict
 
     def delete(self):

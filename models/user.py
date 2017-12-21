@@ -18,12 +18,21 @@ class User(BaseModel, Base):
                         nullable=True)
     last_name = Column(String(128),
                        nullable=True)
-    places = relationship("Place",
-                          backref="user",
-                          cascade="all, delete-orphan")
-    reviews = relationship("Review",
-                           backref="user",
-                           cascade="all, delete-orphan")
+
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        places = relationship("Place",
+                              backref="user",
+                              cascade="all, delete-orphan")
+        reviews = relationship("Review",
+                               backref="user",
+                               cascade="all, delete-orphan")
+    else:
+        @property
+        def places(self):
+            """Return list of places associated with the current user"""
+            place_values
+            
+        def reviews...
 
     def __init__(self, *args, **kwargs):
         """initializes user"""
