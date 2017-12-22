@@ -37,7 +37,7 @@ class DBStorage:
         host = getenv('HBNB_MYSQL_HOST')
         database = getenv('HBNB_MYSQL_DB')
 
-        in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
+        self.in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
 
         if self.in_memory_db:
             self.__engine = create_engine('sqlite:///:memory:')
