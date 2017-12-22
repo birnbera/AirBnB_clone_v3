@@ -26,6 +26,7 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(mock_storage.call_args[0][0], "Amenity")
         self.assertEqual(rv.status_code, 200)
         self.assertEqual(json.loads(rv.get_data(as_text=True)), [])
+
         def mock_return(cls):
             d = {}
             otype = name2class.get(cls)

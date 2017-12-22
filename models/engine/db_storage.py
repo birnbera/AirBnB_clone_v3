@@ -46,10 +46,10 @@ class DBStorage:
         objects = {}
         if type(cls) == str:
             cls = name2class.get(cls, None)
-        if cls: # return specified object
+        if cls:  # return specified object
             for obj in self.__session.query(cls):
                 objects[obj.__class__.__name__ + '.' + obj.id] = obj
-        else: # return all objects
+        else:  # return all objects
             for cls in name2class.values():
                 for obj in self.__session.query(cls):
                     objects[obj.__class__.__name__ + '.' + obj.id] = obj

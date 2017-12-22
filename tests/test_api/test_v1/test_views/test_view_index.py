@@ -20,7 +20,7 @@ class TestIndexAPI(unittest.TestCase):
         self.assertEqual({"status": "OK"},
                          json.loads(rv.get_data(as_text=True)))
         self.assertEqual(rv.status_code, 200)
-        self.assertTrue(rv.headers.has_key('Content-Type'))
+        self.assertTrue('Content-Type' in rv.headers)
         self.assertEqual(rv.headers.get('Content-Type'), 'application/json')
 
     @patch('models.storage.count', autospec=True)
@@ -53,7 +53,7 @@ class TestIndexAPI(unittest.TestCase):
         """Test the result of querying a route that does not exist"""
         rv = self.client.get('/api/v1/nop')
         self.assertEqual(rv.status_code, 404)
-        self.assertTrue(rv.headers.has_key('Content-Type'))
+        self.assertTrue('Content-Type' in rv.headers)
         self.assertEqual(rv.headers.get('Content-Type'), 'application/json')
         self.assertEqual({"error": "Not found"},
                          json.loads(rv.get_data(as_text=True)))
