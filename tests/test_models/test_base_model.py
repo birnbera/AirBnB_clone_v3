@@ -143,7 +143,7 @@ class TestBaseModel(unittest.TestCase):
     def test_str(self):
         """test that the str method has the correct output"""
         inst = BaseModel()
-        string = "[BaseModel] ({}) {}".format(inst.id, inst.__dict__)
+        string = "[BaseModel] ({}) {}".format(inst.id, inst.to_dict())
         self.assertEqual(string, str(inst))
 
     @mock.patch('models.storage')

@@ -68,21 +68,11 @@ class TestAmenity(unittest.TestCase):
         self.assertTrue(hasattr(amenity, "created_at"))
         self.assertTrue(hasattr(amenity, "updated_at"))
 
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db',
-                     "Testing DBStorage")
     def test_name_attr(self):
         """Test that Amenity has attribute name, and it's as an empty string"""
         amenity = Amenity()
         self.assertTrue(hasattr(amenity, "name"))
         self.assertEqual(amenity.name, "")
-
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
-                     "Testing FileStorage")
-    def test_name_attr_db(self):
-        """Test for DBStorage name attribute"""
-        amenity = Amenity()
-        self.assertTrue(hasattr(Amenity, "name"))
-        self.assertIsInstance(Amenity.name, InstrumentedAttribute)
 
     def test_to_dict_creates_dict(self):
         """test to_dict method creates a dictionary with proper attrs"""
@@ -94,8 +84,7 @@ class TestAmenity(unittest.TestCase):
                 if attr == '_sa_instance_state':
                     continue
                 self.assertTrue(attr in new_d)
-        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
-            self.assertTrue("__class__" in new_d)
+        self.assertTrue("__class__" in new_d)
 
     def test_to_dict_values(self):
         """test that values in dict returned from to_dict are correct"""
@@ -111,5 +100,5 @@ class TestAmenity(unittest.TestCase):
     def test_str(self):
         """test that the str method has the correct output"""
         amenity = Amenity()
-        string = "[Amenity] ({}) {}".format(amenity.id, amenity.__dict__)
+        string = "[Amenity] ({}) {}".format(amenity.id, amenity.to_dict())
         self.assertEqual(string, str(amenity))
