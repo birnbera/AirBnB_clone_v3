@@ -9,11 +9,11 @@ from models.place import Place
 @app_views.route('/cities/<city_id>/places')
 def all_places(city_id):
     """Return list of all places in respective to city"""
-    all_places = storage.all("Place")
-    places = [place.to_dict() for place in all_places.values()
-              if place.city_id == city_id]
-
-    return jsonify(places) if len(places) else abort(404)
+    if storage.get("City", city_id) is None:
+        abort(404)
+    all_places = storage.all("Place").values()
+    places = [p.to_dict() for p in all_places if p.city_id == city_id]
+    return jsonify(places)
 
 
 @app_views.route('/cities/<city_id>/places', methods=['POST'])
