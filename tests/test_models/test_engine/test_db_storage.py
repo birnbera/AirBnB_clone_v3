@@ -76,7 +76,7 @@ class TestDBStorage(unittest.TestCase):
         self.create_data()
 
 
-    def create_data()
+    def create_data():
         """Creating Test Data"""
         ca_state = State(name='California')
 
