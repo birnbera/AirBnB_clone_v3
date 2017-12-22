@@ -7,9 +7,9 @@ from api.v1.views import app_views
 from os import getenv
 
 app = Flask('v1')
+app.url_map.strict_slashes = False
 app.register_blueprint(app_views)
 CORS(app, resources="/*", origins="0.0.0.0")
-app.url_map.strict_slashes = False
 
 
 @app.errorhandler(404)
