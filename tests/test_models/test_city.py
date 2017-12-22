@@ -69,37 +69,17 @@ class TestCity(unittest.TestCase):
         self.assertTrue(hasattr(city, "created_at"))
         self.assertTrue(hasattr(city, "updated_at"))
 
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db',
-                     "Testing DBStorage")
     def test_name_attr(self):
         """Test that City has attribute name, and it's an empty string"""
         city = City()
         self.assertTrue(hasattr(city, "name"))
         self.assertEqual(city.name, "")
 
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
-                     "Testing FileStorage")
-    def test_name_attr_db(self):
-        """Test for DBStorage name attribute"""
-        city = City()
-        self.assertTrue(hasattr(City, "name"))
-        self.assertIsInstance(City.name, InstrumentedAttribute)
-
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db',
-                     "Testing DBStorage")
     def test_state_id_attr(self):
         """Test that City has attribute state_id, and it's an empty string"""
         city = City()
         self.assertTrue(hasattr(city, "state_id"))
         self.assertEqual(city.state_id, "")
-
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
-                     "Testing FileStorage")
-    def test_state_id_attr_db(self):
-        """Test for DBStorage state_id attribute"""
-        city = City()
-        self.assertTrue(hasattr(City, "state_id"))
-        self.assertIsInstance(City.state_id, InstrumentedAttribute)
 
     def test_to_dict_creates_dict(self):
         """test to_dict method creates a dictionary with proper attrs"""
@@ -111,8 +91,7 @@ class TestCity(unittest.TestCase):
                 if attr == '_sa_instance_state':
                     continue
                 self.assertTrue(attr in new_d)
-        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
-            self.assertTrue("__class__" in new_d)
+        self.assertTrue("__class__" in new_d)
 
     def test_to_dict_values(self):
         """test that values in dict returned from to_dict are correct"""
@@ -128,5 +107,5 @@ class TestCity(unittest.TestCase):
     def test_str(self):
         """test that the str method has the correct output"""
         city = City()
-        string = "[City] ({}) {}".format(city.id, city.__dict__)
+        string = "[City] ({}) {}".format(city.id, city.to_dict())
         self.assertEqual(string, str(city))

@@ -3,7 +3,8 @@
 connection.
 """
 
-import os
+import json
+from os import getenv
 from models.base_model import Base
 from models.amenity import Amenity
 from models.city import City
@@ -27,17 +28,28 @@ name2class = {
 class DBStorage:
     __engine = None
     __session = None
+    __file_path = "file.json"
+    in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
 
     def __init__(self):
         """ creates connection to db"""
-        user = os.getenv('HBNB_MYSQL_USER')
-        passwd = os.getenv('HBNB_MYSQL_PWD')
-        host = os.getenv('HBNB_MYSQL_HOST')
-        database = os.getenv('HBNB_MYSQL_DB')
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, passwd, host, database))
-        if os.getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.__engine)
+        user = getenv('HBNB_MYSQL_USER')
+        passwd = getenv('HBNB_MYSQL_PWD')
+        host = getenv('HBNB_MYSQL_HOST')
+        database = getenv('HBNB_MYSQL_DB')
+
+        if self.in_memory_db:
+            self.__engine = create_engine('sqlite:///:memory:')
+        if getenv('HBNB_TYPE_STORAGE') == 'db':
+            self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
+                                          .format(user, passwd, host, database))
+        if getenv('HBNB_ENV') == 'test':
+            if database == 'hbnb_dev_db':
+                raise Exception("Using 'hbnb_dev_db' in 'test' mode. "
+                                "This will drop all tables. "
+                                "Are you sure you want to do this?")
+            else:
+                Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """query on current db"""
@@ -61,14 +73,51 @@ class DBStorage:
                                        expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
         self.__session = scoped_session(session_factory)
+        if self.in_memory_db:
+            self.reload_from_json()
+            self.__session.flush()
+
+    def reload_from_json(self):
+        """deserializes the JSON file to __objects"""
+        def object_hook(o):
+            if '__class__' in o:
+                oclass = o['__class__']
+                return name2class[oclass](**o)
+            else:
+                return o
+
+        try:
+            with open(self.__file_path, 'r') as f:
+                self.__objects = json.load(f, object_hook=object_hook)
+        except:
+            self.__objects.clear()
+            raise
 
     def new(self, obj):
         """add the object to the current database session"""
-        self.__session.add(obj)
+        # if sl then only add if obj isnt in session
+        # if db then add obj regardless into session
+        if not self.get(obj.__name__, obj.id) or \
+                getenv('HBNB_TYPE_STORAGE') == 'db':
+            self.__session.add(obj)
 
     def save(self):
         """commit all changes of the current database session"""
         self.__session.commit()
+        if self.in_memory_db:
+            self.save_to_json()
+
+    def save_to_json(self):
+        """serializes __objects to the JSON file (path: __file_path)"""
+        class MyEncoder(json.JSONEncoder):
+            def default(self, o):
+                try:
+                    return o.to_dict()
+                except AttributeError as e:
+                    return o
+
+        with open(self.__file_path, 'w') as f:
+            json.dump(self.all(), f, cls=MyEncoder)
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""
@@ -82,10 +131,11 @@ class DBStorage:
         self.__session.remove()
 
     def get(self, cls, id):
-        """Retrieve object based on class name and its id, else None if not found"""
+        """Retrieve object based on class name and id, else None if not found"""
         cls = name2class.get(cls, None)
-        return self.__session.query(cls).filter(cls.id == id).first() if cls else None
+        return self.__session.query(cls).filter(cls.id == id).first() \
+            if cls else None
 
     def count(self, cls=None):
-        """Count number of objects in storage or specific number of cls objects"""
+        """Count number of objects in storage or number of type `cls`"""
         return len(self.all(cls))
