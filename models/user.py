@@ -39,7 +39,6 @@ class User(BaseModel, Base):
             return list(filter(lambda r: r.user_id == self.id,
                                review_values))
 
-
     def __init__(self, *args, **kwargs):
         """initializes user"""
         self.email = kwargs.pop("email", "")

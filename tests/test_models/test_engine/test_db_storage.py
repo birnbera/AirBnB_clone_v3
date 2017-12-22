@@ -75,8 +75,7 @@ class TestDBStorage(unittest.TestCase):
         """Set up class"""
         self.create_data()
 
-
-    def create_data()
+    def create_data():
         """Creating Test Data"""
         ca_state = State(name='California')
 
@@ -98,17 +97,16 @@ class TestDBStorage(unittest.TestCase):
                            amenity_id=home_amenity.id,
                            user_id=am_user.id)
         sav_place = Place(name='San Antonio Villa',
-                           city_id=pa_city.id,
-                           amenity_id=sav_amenity.id,
-                           user_id=ab_user.id)
-
+                          city_id=pa_city.id,
+                          amenity_id=sav_amenity.id,
+                          user_id=ab_user.id)
 
         home_review = Review(text="Is a dope house",
                              place_id=home_place.id,
                              user_id=ab_user.id)
         sav_review = Review(text="Is a wack villa",
-                             place_id=home_place.id,
-                             user_id=am_user.id)
+                            place_id=home_place.id,
+                            user_id=am_user.id)
 
     def test_all_returns_dict(self):
         """Test that all returns the DBStorage.__objects attr"""
