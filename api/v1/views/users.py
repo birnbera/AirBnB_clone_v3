@@ -1,4 +1,4 @@
-#!/user/bin/python3
+#!/usr/bin/python3
 """User API endpoint"""
 from flask import abort, jsonify, request
 from api.v1.views import app_views
