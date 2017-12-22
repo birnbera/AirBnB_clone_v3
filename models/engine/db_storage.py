@@ -26,6 +26,7 @@ name2class = {
 
 
 class DBStorage:
+    """Class to represent database storage object"""
     __engine = None
     __session = None
     __file_path = "file.json"

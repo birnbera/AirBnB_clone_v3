@@ -72,9 +72,8 @@ class FileStorage:
         try:
             with open(self.__file_path, 'r') as f:
                 self.__objects = json.load(f, object_hook=object_hook)
-        except:
+        except FileNotFoundError:
             self.__objects.clear()
-            raise
 
     def delete(self, obj=None):
         """delete obj from __objects if it’s inside"""
