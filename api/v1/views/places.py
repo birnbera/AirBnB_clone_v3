@@ -38,6 +38,8 @@ def add_place(city_id):
     data.pop('updated_at', None)
     data.update({'city_id': city_id})
 
+    if storage.get("User", user_id) is None:
+        abort(404)
     # this place already exists. Just update place with new data
     for place in storage.all("Place").values():
         if place.name == name and place.user_id == user_id:
