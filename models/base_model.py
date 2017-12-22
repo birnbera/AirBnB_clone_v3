@@ -10,7 +10,7 @@ from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 import uuid
 
-time_fmt = "%Y-%m-%dT%H:%M:%S"
+time_fmt = "%Y-%m-%dT%H:%M:%S.%f"
 
 Base = declarative_base()
 
@@ -32,6 +32,7 @@ class BaseModel:
             self.created_at = datetime.strptime(self.created_at, time_fmt)
         if type(self.updated_at) is str:
             self.updated_at = datetime.strptime(self.updated_at, time_fmt)
+        models.storage.new(self)
 
     def __str__(self):
         """String representation of the BaseModel class"""

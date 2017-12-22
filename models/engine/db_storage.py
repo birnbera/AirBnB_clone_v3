@@ -92,13 +92,14 @@ class DBStorage:
         except:
             self.__objects.clear()
             raise
-        else: # only add obj to session if its not present
-            [self.__session.add(obj) for obj in self.__objects.values() \
-                    if not self.get(obj.__name__, obj.id)]
 
     def new(self, obj):
         """add the object to the current database session"""
-        self.__session.add(obj)
+        # if sl then only add if obj isnt in session
+        # if db then add obj regardless into session
+        if not self.get(obj.__name__, obj.id) or \
+                getenv('HBNB_TYPE_STORAGE') == 'db':
+            self.__session.add(obj)
 
     def save(self):
         """commit all changes of the current database session"""
@@ -113,7 +114,6 @@ class DBStorage:
                 try:
                     return o.to_dict()
                 except AttributeError as e:
-                    print(e)
                     return o
 
         with open(self.__file_path, 'w') as f:
