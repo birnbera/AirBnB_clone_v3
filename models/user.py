@@ -19,7 +19,7 @@ class User(BaseModel, Base):
     last_name = Column(String(128),
                        nullable=True)
 
-    if getenv("HBNB_TYPE_STORAGE") == "db":
+    if getenv("HBNB_TYPE_STORAGE") in ["db", "sl"]:
         places = relationship("Place",
                               backref="user",
                               cascade="all, delete-orphan")
@@ -31,8 +31,14 @@ class User(BaseModel, Base):
         def places(self):
             """Return list of places associated with the current user"""
             place_values
-            
-        def reviews...
+
+        @property
+        def reviews(self):
+            """Return list of reviews associated with the current user"""
+            review_values = models.storage.all("Review").values()
+            return list(filter(lambda r: r.user_id == self.id,
+                               review_values))
+
 
     def __init__(self, *args, **kwargs):
         """initializes user"""

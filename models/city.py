@@ -3,7 +3,6 @@
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
-import sqlalchemy
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
@@ -18,10 +17,18 @@ class City(BaseModel, Base):
                       ForeignKey('states.id'),
                       nullable=False)
 
-    if getenv("HBNB_TYPE_STORAGE") == "db":
+    if getenv("HBNB_TYPE_STORAGE") in ["db", "sl"]:
         places = relationship("Place",
                               backref="cities",
                               cascade="all, delete-orphan")
+
+    else:
+        @property
+        def places(self):
+            """Return all places associated with the current city"""
+            place_values = models.storage.all("Place").values()
+            return list(filter(lambda p: p.city_id == self.id,
+                               place_values))
 
     def __init__(self, *args, **kwargs):
         """initializes city"""

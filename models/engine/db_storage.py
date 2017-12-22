@@ -3,6 +3,7 @@
 connection.
 """
 
+import json
 from os import getenv
 from models.base_model import Base
 from models.amenity import Amenity
@@ -27,6 +28,8 @@ name2class = {
 class DBStorage:
     __engine = None
     __session = None
+    __file_path = "file.json"
+    in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
 
     def __init__(self):
         """ creates connection to db"""
@@ -34,8 +37,12 @@ class DBStorage:
         passwd = getenv('HBNB_MYSQL_PWD')
         host = getenv('HBNB_MYSQL_HOST')
         database = getenv('HBNB_MYSQL_DB')
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, passwd, host, database))
+
+        if self.in_memory_db:
+            self.__engine = create_engine('sqlite:///:memory:')
+        if getenv('HBNB_TYPE_STORAGE') == 'db':
+            self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
+                                          .format(user, passwd, host, database))
         if getenv('HBNB_ENV') == 'test':
             if database == 'hbnb_dev_db':
                 raise Exception("Using 'hbnb_dev_db' in 'test' mode. "
@@ -66,6 +73,28 @@ class DBStorage:
                                        expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
         self.__session = scoped_session(session_factory)
+        if self.in_memory_db:
+            self.reload_from_json()
+            self.__session.flush()
+
+    def reload_from_json(self):
+        """deserializes the JSON file to __objects"""
+        def object_hook(o):
+            if '__class__' in o:
+                oclass = o['__class__']
+                return name2class[oclass](**o)
+            else:
+                return o
+
+        try:
+            with open(self.__file_path, 'r') as f:
+                self.__objects = json.load(f, object_hook=object_hook)
+        except:
+            self.__objects.clear()
+            raise
+        else: # only add obj to session if its not present
+            [self.__session.add(obj) for obj in self.__objects.values() \
+                    if not self.get(obj.__name__, obj.id)]
 
     def new(self, obj):
         """add the object to the current database session"""
@@ -74,6 +103,21 @@ class DBStorage:
     def save(self):
         """commit all changes of the current database session"""
         self.__session.commit()
+        if self.in_memory_db:
+            self.save_to_json()
+
+    def save_to_json(self):
+        """serializes __objects to the JSON file (path: __file_path)"""
+        class MyEncoder(json.JSONEncoder):
+            def default(self, o):
+                try:
+                    return o.to_dict()
+                except AttributeError as e:
+                    print(e)
+                    return o
+
+        with open(self.__file_path, 'w') as f:
+            json.dump(self.all(), f, cls=MyEncoder)
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""
