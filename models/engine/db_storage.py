@@ -26,10 +26,10 @@ name2class = {
 
 
 class DBStorage:
+    """Class to represent database storage object"""
     __engine = None
     __session = None
     __file_path = "file.json"
-    in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
 
     def __init__(self):
         """ creates connection to db"""
@@ -38,11 +38,16 @@ class DBStorage:
         host = getenv('HBNB_MYSQL_HOST')
         database = getenv('HBNB_MYSQL_DB')
 
+        self.in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
+
         if self.in_memory_db:
             self.__engine = create_engine('sqlite:///:memory:')
-        if getenv('HBNB_TYPE_STORAGE') == 'db':
+        elif getenv('HBNB_TYPE_STORAGE') == 'db':
             self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                          .format(user, passwd, host, database))
+                                          .format(user,
+                                                  passwd,
+                                                  host,
+                                                  database))
         if getenv('HBNB_ENV') == 'test':
             if database == 'hbnb_dev_db':
                 raise Exception("Using 'hbnb_dev_db' in 'test' mode. "
@@ -97,7 +102,7 @@ class DBStorage:
         """add the object to the current database session"""
         # if sl then only add if obj isnt in session
         # if db then add obj regardless into session
-        if not self.get(obj.__name__, obj.id) or \
+        if not self.get(obj.__class__.__name__, obj.id) or \
                 getenv('HBNB_TYPE_STORAGE') == 'db':
             self.__session.add(obj)
 
@@ -131,7 +136,8 @@ class DBStorage:
         self.__session.remove()
 
     def get(self, cls, id):
-        """Retrieve object based on class name and id, else None if not found"""
+        """Retrieve object based on class name and id, else None
+        if not found"""
         cls = name2class.get(cls, None)
         return self.__session.query(cls).filter(cls.id == id).first() \
             if cls else None
