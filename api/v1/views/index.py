@@ -5,15 +5,21 @@ from api.v1.views import app_views
 from models import storage
 
 
-@app_views.route('/status', strict_slashes=False)
+@app_views.route('/status')
 def get_status():
     """Returns HTTP status 200"""
     return jsonify({"status": "OK"}), 200
 
 
-@app_views.route('/stats', strict_slashes=False)
+@app_views.route('/stats')
 def get_count():
     """retrieves the number of each objects by type"""
-    stats = {"amenities": "Amenity", "cities": "City", "places": "Place",
-             "reviews": "Review", "states": "State", "users": "User"}
-    return jsonify({name: storage.count(obj) for name, obj in stats.items()})
+    stats = {
+        "Amenity": "amenities",
+        "City": "cities",
+        "Place": "places",
+        "Review": "reviews",
+        "State": "states",
+        "User": "users"
+    }
+    return jsonify({name: storage.count(cls) for cls, name in stats.items()})
