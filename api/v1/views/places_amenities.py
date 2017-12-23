@@ -8,6 +8,7 @@ from os import getenv
 
 db_storage = (getenv("HBNB_TYPE_STORAGE") in ["db", "sl"])
 
+
 @app_views.route('/places/<place_id>/amenities')
 def get_place_amenities(place_id):
     """Get a list of all amenites associated with place
@@ -16,6 +17,7 @@ def get_place_amenities(place_id):
     if not place:
         abort(404)
     return jsonify([a.to_dict() for a in place.amenities])
+
 
 @app_views.route('/places/<place_id>/amenities/<amenity_id>',
                  methods=['DELETE'])
@@ -43,6 +45,7 @@ def delete_place_amenity(place_id, amenity_id):
 
     return jsonify({})
 
+
 @app_views.route('/places/<place_id>/amenities/<amenity_id>',
                  methods=['POST'])
 def post_place_amenity(place_id, amenity_id):
@@ -58,7 +61,7 @@ def post_place_amenity(place_id, amenity_id):
 
     place_amenities = place.amenities
     place_amenity = list(filter(lambda a: a.id == amenity_id, place_amenities))
-    if place_amenity: # amenity already exists for this place
+    if place_amenity:  # amenity already exists for this place
         return jsonify(amenity.to_dict())
 
     if db_storage:
