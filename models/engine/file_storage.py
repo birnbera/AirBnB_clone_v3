@@ -52,9 +52,8 @@ class FileStorage:
         class MyEncoder(json.JSONEncoder):
             def default(self, o):
                 try:
-                    return o.to_dict()
+                    return o.to_dict(to_storage=True)
                 except AttributeError as e:
-                    print(e)
                     return o
 
         with open(self.__file_path, 'w') as f:

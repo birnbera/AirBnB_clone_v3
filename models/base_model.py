@@ -45,15 +45,15 @@ class BaseModel:
         models.storage.new(self)
         models.storage.save()
 
-    def to_dict(self):
+    def to_dict(self, **kwargs):
         """returns a dictionary containing all keys/values of the instance"""
-        new_dict = self.__dict__.copy()
+        new_dict = dict(list(filter(lambda i: not i[0].startswith('_'),
+                                    vars(self).items())))
         if "created_at" in new_dict:
             new_dict["created_at"] = new_dict["created_at"].isoformat()
         if "updated_at" in new_dict:
             new_dict["updated_at"] = new_dict["updated_at"].isoformat()
         new_dict["__class__"] = self.__class__.__name__
-        new_dict.pop('_sa_instance_state', None)
         return new_dict
 
     def delete(self):
