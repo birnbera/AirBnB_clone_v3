@@ -9,8 +9,8 @@ from models.state import State
 @app_views.route('/states')
 def all_states():
     """Return list of all states"""
-    all_states = storage.all("State")
-    return jsonify([obj.to_dict() for obj in all_states.values()])
+    all_states = storage.all("State").values()
+    return jsonify([obj.to_dict() for obj in all_states])
 
 
 @app_views.route('/states', methods=['POST'])
