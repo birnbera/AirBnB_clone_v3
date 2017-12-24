@@ -37,6 +37,7 @@ class User(BaseModel, Base):
             review_values = models.storage.all("Review").values()
             return list(filter(lambda r: r.user_id == self.id,
                                review_values))
+
     @property
     def password(self):
         """Getter for protected _password attribute."""
