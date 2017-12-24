@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 """ holds class Place"""
+import logging
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
 from sqlalchemy import Column, String, Integer, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
+log = logging.getLogger()
 
 place_amenity = Table('place_amenity', Base.metadata,
                       Column('place_id',
@@ -58,6 +60,7 @@ class Place(BaseModel, Base):
         @property
         def reviews(self):
             """attribute that returns list of Review instances"""
+            log.info("fetching all reviews for %s", self.name)
             review_values = models.storage.all("Review").values()
             return list(filter(lambda r: r.place_id == self.id,
                                review_values))
@@ -65,6 +68,7 @@ class Place(BaseModel, Base):
         @property
         def amenities(self):
             """attribute that returns list of Amenity instances"""
+            log.info("fetching all amenities for %s", self.name)
             amenity_values = models.storage.all("Amenity").values()
             return list(filter(lambda a: a.id in self.amenity_ids,
                                amenity_values))
@@ -83,4 +87,8 @@ class Place(BaseModel, Base):
         self.longitude = kwargs.pop("longitude", 0.0)
         self.amenity_ids = list(map(lambda a: a if type(a) == str else a.id,
                                     kwargs.pop("amenities", [])))
+
+        log.info("Place instance created for %s", self.name)
         super().__init__(*args, **kwargs)
+
+    log.info("%s table generated", __tablename__)

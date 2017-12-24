@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 """ holds class User"""
+import logging
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String
+log = logging.getLogger()
 
 
 class User(BaseModel, Base):
@@ -30,11 +32,13 @@ class User(BaseModel, Base):
         @property
         def places(self):
             """Return list of places associated with the current user"""
+            log.info("fetching all places for %s", self.first_name)
             place_values
 
         @property
         def reviews(self):
             """Return list of reviews associated with the current user"""
+            log.info("fetching all places for %s", self.first_name)
             review_values = models.storage.all("Review").values()
             return list(filter(lambda r: r.user_id == self.id,
                                review_values))
@@ -45,4 +49,9 @@ class User(BaseModel, Base):
         self.password = kwargs.pop("password", "")
         self.first_name = kwargs.pop("first_name", "")
         self.last_name = kwargs.pop("last_name", "")
+
+        log.info("Uer instance created for %s %s", \
+                 self.first_name, self.last_name)
         super().__init__(*args, **kwargs)
+
+    log.info("%s table generated", __tablename__)

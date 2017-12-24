@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 """ holds class Review"""
+import logging
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy import ForeignKey
+log = logging.getLogger()
 
 
 class Review(BaseModel, Base):
@@ -22,4 +24,8 @@ class Review(BaseModel, Base):
         self.text = kwargs.pop("text", "")
         self.place_id = kwargs.pop("place_id", "")
         self.user_id = kwargs.pop("user_id", "")
+
+        log.info("Review instance created for place %s", self.place_id)
         super().__init__(*args, **kwargs)
+
+    log.info("%s table generated", __tablename__)

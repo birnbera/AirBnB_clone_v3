@@ -3,12 +3,15 @@
 Contains class BaseModel
 """
 
+import logging
 from datetime import datetime
 import models
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 import uuid
+
+log = logging.getLogger()
 
 time_fmt = "%Y-%m-%dT%H:%M:%S.%f"
 
@@ -32,21 +35,28 @@ class BaseModel:
             self.created_at = datetime.strptime(self.created_at, time_fmt)
         if type(self.updated_at) is str:
             self.updated_at = datetime.strptime(self.updated_at, time_fmt)
+
+        log.info("attributes defined for instance %s.%s", self.name, self.id)
+
         models.storage.new(self)
+
 
     def __str__(self):
         """String representation of the BaseModel class"""
+        log.info("__str__ magic method called for instance: %s", self.name)
         return "[{:s}] ({:s}) {}".format(self.__class__.__name__, self.id,
                                          self.to_dict())
 
     def save(self):
         """updates the attribute 'updated_at' with the current datetime"""
+        log.info("save method called for instance: %s", self.name)
         self.updated_at = datetime.now()
         models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
         """returns a dictionary containing all keys/values of the instance"""
+        log.info("to_dict method called for instance: %s", self.name)
         new_dict = self.__dict__.copy()
         if "created_at" in new_dict:
             new_dict["created_at"] = new_dict["created_at"].isoformat()
@@ -58,4 +68,5 @@ class BaseModel:
 
     def delete(self):
         """Delete current instance from storage by calling its delete method"""
+        log.info("delete method called for instance: %s", self.name)
         models.storage.delete(self)

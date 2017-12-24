@@ -3,6 +3,7 @@
 connection.
 """
 
+import logging
 import json
 from os import getenv
 from models.base_model import Base
@@ -14,6 +15,8 @@ from models.review import Review
 from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+
+log = logging.getLogger()
 
 name2class = {
     'Amenity': Amenity,
@@ -33,10 +36,13 @@ class DBStorage:
 
     def __init__(self):
         """ creates connection to db"""
+
         user = getenv('HBNB_MYSQL_USER')
         passwd = getenv('HBNB_MYSQL_PWD')
         host = getenv('HBNB_MYSQL_HOST')
         database = getenv('HBNB_MYSQL_DB')
+
+        log.info("DB initilized")
 
         self.in_memory_db = getenv("HBNB_TYPE_STORAGE") == 'sl'
 
@@ -54,10 +60,14 @@ class DBStorage:
                                 "This will drop all tables. "
                                 "Are you sure you want to do this?")
             else:
+                log.critical("enviroment var set to `test`, dropping tables!")
                 Base.metadata.drop_all(self.__engine)
+
 
     def all(self, cls=None):
         """query on current db"""
+        log.info("Ω")
+
         if not self.__session:
             self.reload()
         objects = {}
@@ -74,6 +84,8 @@ class DBStorage:
 
     def reload(self):
         """load all tables"""
+        log.warning("Pray to your gods!")
+
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
@@ -84,6 +96,8 @@ class DBStorage:
 
     def reload_from_json(self):
         """deserializes the JSON file to __objects"""
+        log.warning("accessing file: %s", self.__file_path)
+
         def object_hook(o):
             if '__class__' in o:
                 oclass = o['__class__']
@@ -100,6 +114,7 @@ class DBStorage:
 
     def new(self, obj):
         """add the object to the current database session"""
+        log.info("Ω")
         # if sl then only add if obj isnt in session
         # if db then add obj regardless into session
         if not self.get(obj.__class__.__name__, obj.id) or \
@@ -108,12 +123,14 @@ class DBStorage:
 
     def save(self):
         """commit all changes of the current database session"""
+        log.info("Ω")
         self.__session.commit()
         if self.in_memory_db:
             self.save_to_json()
 
     def save_to_json(self):
         """serializes __objects to the JSON file (path: __file_path)"""
+        log.warning("accessing file: %s", self.__file_path)
         class MyEncoder(json.JSONEncoder):
             def default(self, o):
                 try:
@@ -126,6 +143,8 @@ class DBStorage:
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""
+        log.warning()
+
         if not self.__session:
             self.reload()
         if obj:
@@ -133,15 +152,18 @@ class DBStorage:
 
     def close(self):
         """Dispose of current session if active"""
+        log.warning("Pray to your gods!")
         self.__session.remove()
 
     def get(self, cls, id):
         """Retrieve object based on class name and id, else None
         if not found"""
+        log.info("Ω")
         cls = name2class.get(cls, None)
         return self.__session.query(cls).filter(cls.id == id).first() \
             if cls else None
 
     def count(self, cls=None):
         """Count number of objects in storage or number of type `cls`"""
+        log.info("Ω")
         return len(self.all(cls))

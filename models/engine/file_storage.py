@@ -3,6 +3,7 @@
 Contains the FileStorage class
 """
 
+import logging
 import json
 from models.amenity import Amenity
 from models.base_model import BaseModel
@@ -11,6 +12,8 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+
+log = logging.getLogger()
 
 classes = {
     "Amenity": Amenity,
@@ -30,8 +33,11 @@ class FileStorage:
     # dictionary - empty but will store all objects by <class name>.id
     __objects = {}
 
+    log.info("File initilized")
+
     def all(self, cls=None):
         """returns the dictionary __objects"""
+        log.info("Ω")
         if not cls:
             return self.__objects
         elif type(cls) == str:
@@ -43,12 +49,14 @@ class FileStorage:
 
     def new(self, obj):
         """sets in __objects the obj with key <obj class name>.id"""
+        log.info("Ω")
         if obj is not None:
             key = obj.__class__.__name__ + "." + obj.id
             self.__objects[key] = obj
 
     def save(self):
         """serializes __objects to the JSON file (path: __file_path)"""
+        log.warning("pheww everything ran smoothly")
         class MyEncoder(json.JSONEncoder):
             def default(self, o):
                 try:
@@ -62,6 +70,7 @@ class FileStorage:
 
     def reload(self):
         """deserializes the JSON file to __objects"""
+        log.warning("accessing file: %s", self.__file_path)
         def object_hook(o):
             if '__class__' in o:
                 oclass = o['__class__']
@@ -77,21 +86,25 @@ class FileStorage:
 
     def delete(self, obj=None):
         """delete obj from __objects if it’s inside"""
+        log.warning("you shall not pass!")
         if obj is not None:
             del self.__objects[obj.__class__.__name__ + '.' + obj.id]
             self.save()
 
     def close(self):
         """Deserialize JSON file to objects"""
+        log.info("Ω")
         self.__objects.clear()
         self.reload()
 
     def get(self, cls, id):
         """Returns obj based on cls and id else None"""
+        log.info("Ω")
         return self.__objects.get(cls + '.' + id, None) \
             if type(cls) == str and type(id) == str else None
 
     def count(self, cls=None):
         """Count number of objects in storage or specific number
         of cls objects"""
+        log.info("Ω")
         return len(self.all(cls))
