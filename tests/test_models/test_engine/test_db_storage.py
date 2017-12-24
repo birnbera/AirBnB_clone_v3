@@ -5,7 +5,7 @@ Contains the TestDBStorageDocs classes
 
 from datetime import datetime
 import inspect
-from models.engine import db_storage
+from models.engine import db_storage, file_storage
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City
@@ -17,10 +17,18 @@ import json
 import os
 import pep8
 import unittest
+from unittest.mock import patch, Mock
+
 DBStorage = db_storage.DBStorage
+FileStorage = file_storage.FileStorage
+
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
+if os.getenv("HBNB_TYPE_STORAGE") == "db":
+    StorageClass = DBStorage
+else:
+    StorageClass = FileStorage
 
 class TestDBStorageDocs(unittest.TestCase):
     """Tests to check the documentation and style of DBStorage class"""
@@ -70,12 +78,20 @@ test_file_storage.py'])
 class TestDBStorage(unittest.TestCase):
     """Test the DBStorage class"""
 
-    @classmethod
-    def setUpClass(cls):
-        """Set up class"""
+    def setUp(self):
+        """Build storage"""
+        self.storage = StorageClass()
+        self.mock_storage = patch('models.storage', wraps=self.storage)
+        self.storage.reload()
+        self.mock_storage.start()
         self.create_data()
 
-    def create_data():
+    def tearDown(self):
+        """Destroy storage and clear everything"""
+        self.storage.close()
+        self.mock_storage.stop()
+
+    def create_data(self):
         """Creating Test Data"""
         ca_state = State(name='California')
 
@@ -83,69 +99,86 @@ class TestDBStorage(unittest.TestCase):
         sf_city = City(name='San Francisco', state_id=ca_state.id)
 
         am_user = User(first_name='Anoop', last_name='Lion',
-                       email='149@holbertonschool.com',
-                       password='N00pL10n')
+                            email='149@holbertonschool.com',
+                            password='N00pL10n')
         ab_user = User(first_name='Andrew', last_name='Indi',
-                       email='144@holbertonschool.com',
-                       password='Ind1')
+                            email='144@holbertonschool.com',
+                            password='Ind1')
 
         home_amenity = Amenity(name="Wifi")
         sav_amenity = Amenity(name="Washer")
 
         home_place = Place(name='Tall Tree House',
-                           city_id=pa_city.id,
-                           amenity_id=home_amenity.id,
-                           user_id=am_user.id)
+                                city_id=pa_city.id,
+                                amenity_id=home_amenity.id,
+                                user_id=am_user.id)
         sav_place = Place(name='San Antonio Villa',
-                          city_id=pa_city.id,
-                          amenity_id=sav_amenity.id,
-                          user_id=ab_user.id)
+                               city_id=pa_city.id,
+                               amenity_id=sav_amenity.id,
+                               user_id=ab_user.id)
 
         home_review = Review(text="Is a dope house",
-                             place_id=home_place.id,
-                             user_id=ab_user.id)
+                                  place_id=home_place.id,
+                                  user_id=ab_user.id)
         sav_review = Review(text="Is a wack villa",
                             place_id=home_place.id,
                             user_id=am_user.id)
 
-    def test_all_returns_dict(self):
-        """Test that all returns the DBStorage.__objects attr"""
-        storage = DBStorage()
-        new_dict = storage.all()
-        self.assertEqual(type(new_dict), dict)
-        self.assertIs(new_dict, storage._DBStorage__objects)
+        self.in_session_obj = set([ca_state, pa_city, sf_city, am_user,
+                               ab_user, home_amenity, sav_amenity,
+                               home_place, sav_place, home_review,
+                               sav_review])
 
-    def test_new(self):
-        """test that new adds an object to the DBStorage.__objects attr"""
-        storage = DBStorage()
-        save = DBStorage._DBStorage__objects
-        DBStorage._DBStorage__objects = {}
-        test_dict = {}
-        for key, value in classes.items():
-            with self.subTest(key=key, value=value):
-                instance = value()
-                instance_key = instance.__class__.__name__ + "." + instance.id
-                storage.new(instance)
-                test_dict[instance_key] = instance
-                self.assertEqual(test_dict, storage._DBStorage__objects)
-        DBStorage._DBStorage__objects = save
+    @patch.object(self.storage, 'new', self.storage.new)
+    def test_new_obj(self):
+        """Test if new object is created its added to session"""
+        method_calls = self.mock_storage.call_args_list
+        print(method_calls)
+        return
+        self.assertEqual('11', mock_count)
 
-    def test_save(self):
-        """Test that save properly saves objects to file.json"""
-        os.remove("file.json")
-        storage = DBStorage()
-        new_dict = {}
-        for key, value in classes.items():
-            instance = value()
-            instance_key = instance.__class__.__name__ + "." + instance.id
-            new_dict[instance_key] = instance
-        save = DBStorage._DBStorage__objects
-        DBStorage._DBStorage__objects = new_dict
-        storage.save()
-        DBStorage._DBStorage__objects = save
-        for key, value in new_dict.items():
-            new_dict[key] = value.to_dict()
-        string = json.dumps(new_dict)
-        with open("file.json", "r") as f:
-            js = f.read()
-        self.assertEqual(json.loads(string), json.loads(js))
+
+        obj_called_on = self.mock_storage.new.call_args_list.call_list()
+        self.assertEqual(self.in_session_obj, set(obj_called_on))
+
+   # def test_all_returns_dict(self):
+   #     """Test that all returns the DBStorage.__objects attr"""
+   #     storage = DBStorage()
+   #     new_dict = storage.all()
+   #     self.assertEqual(type(new_dict), dict)
+   #     self.assertIs(new_dict, storage._DBStorage__objects)
+
+   # def test_new(self):
+   #     """test that new adds an object to the DBStorage.__objects attr"""
+   #     storage = DBStorage()
+   #     save = DBStorage._DBStorage__objects
+   #     DBStorage._DBStorage__objects = {}
+   #     test_dict = {}
+   #     for key, value in classes.items():
+   #         with self.subTest(key=key, value=value):
+   #             instance = value()
+   #             instance_key = instance.__class__.__name__ + "." + instance.id
+   #             storage.new(instance)
+   #             test_dict[instance_key] = instance
+   #             self.assertEqual(test_dict, storage._DBStorage__objects)
+   #     DBStorage._DBStorage__objects = save
+
+   # def test_save(self):
+   #     """Test that save properly saves objects to file.json"""
+   #     os.remove("file.json")
+   #     storage = DBStorage()
+   #     new_dict = {}
+   #     for key, value in classes.items():
+   #         instance = value()
+   #         instance_key = instance.__class__.__name__ + "." + instance.id
+   #         new_dict[instance_key] = instance
+   #     save = DBStorage._DBStorage__objects
+   #     DBStorage._DBStorage__objects = new_dict
+   #     storage.save()
+   #     DBStorage._DBStorage__objects = save
+   #     for key, value in new_dict.items():
+   #         new_dict[key] = value.to_dict()
+   #     string = json.dumps(new_dict)
+   #     with open("file.json", "r") as f:
+   #         js = f.read()
+   #     self.assertEqual(json.loads(string), json.loads(js))

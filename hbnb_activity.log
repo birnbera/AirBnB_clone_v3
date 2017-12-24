@@ -1,0 +1,9 @@
+2017-12-24 01:28:52,526 - INFO    - amenity    - Amenity : amenities table generated
+2017-12-24 01:28:52,528 - INFO    - city       - City    : cities table generated
+2017-12-24 01:28:52,531 - INFO    - place      - Place   : places table generated
+2017-12-24 01:28:52,533 - INFO    - state      - State   : states table generated
+2017-12-24 01:28:52,535 - INFO    - review     - Review  : reviews table generated
+2017-12-24 01:28:52,537 - INFO    - user       - User    : users table generated
+2017-12-24 01:28:52,539 - INFO    - __init__   - <module>: DataBase Instance created
+2017-12-24 01:28:52,539 - INFO    - db_storage - __init__: DB initilized
+2017-12-24 01:28:52,544 - WARNING - db_storage - reload  : Pray to your gods!

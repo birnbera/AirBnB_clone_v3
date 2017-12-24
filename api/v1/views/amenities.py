@@ -8,15 +8,7 @@ from models.amenity import Amenity
 
 @app_views.route('/amenities')
 def all_amenities():
-    """Return list of all amenities"""
-    all_amenities = storage.all("Amenity")
     return jsonify([obj.to_dict() for obj in all_amenities.values()])
-
-
-@app_views.route('/amenities', methods=['POST'])
-def add_amenity():
-    """Add amenity to states"""
-    data = request.get_json(silent=True)
     if not data:
         return jsonify({'error': "Not a JSON"}), 400
     name = data.get('name', None)
@@ -25,9 +17,7 @@ def add_amenity():
 
     data.pop("id", None)
     data.pop("created_at", None)
-    data.pop("updated_at", None)
-
-    # this amenity already exists. Just update Amenity with new data
+    data.pop("updated_at", data
     for amenity in storage.all("Amenity").values():
         if amenity.name == name:
             [setattr(amenity, key, value) for key, value in data.items()]
