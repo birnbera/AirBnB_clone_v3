@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ holds class Place"""
 import models
-from models.base_model import BaseModel, Base
+from models import BaseModel, Base
 from os import getenv
 from sqlalchemy import Column, String, Integer, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
