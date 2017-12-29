@@ -17,7 +17,7 @@ def all_amenities():
 def add_amenity():
     """Add amenity to states"""
     data = request.get_json(silent=True)
-    if not data:
+    if not data and data != {}:
         return jsonify({'error': "Not a JSON"}), 400
     name = data.get('name', None)
     if not name:
@@ -39,26 +39,39 @@ def add_amenity():
     return jsonify(amenity.to_dict()), 201
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['GET', 'PUT', 'DELETE'])
-def manipulate_amenity(amenity_id):
-    """GET/UPDATE/DELETE amenity object based off id else raise 400"""
+@app_views.route('/amenities/<amenity_id>', methods=['GET'])
+def get_amenity(amenity_id):
+    """GET amenity object based off id"""
+    amenity = storage.get("Amenity", amenity_id)
+    if not amenity:
+        abort(404)
+    return jsonify(amenity.to_dict()), 200
 
-    amenity = storage.get("Amenity", amenity_id)  # Get Amenity
+
+@app_views.route('/amenities/<amenity_id>', methods=['PUT'])
+def update_amenity(amenity_id):
+    """UPDATE amenity object based off id"""
+    amenity = storage.get("Amenity", amenity_id)
     if not amenity:
         abort(404)
 
-    if request.method == 'PUT':  # Update amenity
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify({'error': "Not a JSON"}), 400
-        # update attributes
-        [setattr(amenity, key, value) for key, value in data.items()
-         if key not in ["id", "created_at", "updated_at"]]
-        amenity.save()
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': "Not a JSON"}), 400
+    for key, value in data.items():
+        if key in ["id", "created_at", "updated_at"]:
+            continue
+        setattr(amenity, key, value)
+    amenity.save()
+    return jsonify(amenity.to_dict()), 200
 
-    if request.method == 'DELETE':  # Delete amenity
-        amenity.delete()
-        storage.save()
-        return jsonify({}), 200  # DELETE method
 
-    return jsonify(amenity.to_dict()), 200  # GET, PUT method
+@app_views.route('/amenities/<amenity_id>', methods=['DELETE'])
+def delete_amenity(amenity_id):
+    """DELETE amenity object based off id"""
+    amenity = storage.get("Amenity", amenity_id)
+    if not amenity:
+        abort(404)
+    amenity.delete()
+    storage.save()
+    return jsonify({}), 200

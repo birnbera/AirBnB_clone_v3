@@ -55,6 +55,30 @@ class TestAmenityAPI(unittest.TestCase):
                          sorted(map(lambda v: v.id,
                                     d.values())))
 
+    def test_get_amenity(self, mock_class_storage, mock_api_storage):
+        """Test route to get single amenity instance"""
+        mock_api_storage.get.return_value = None
+        amenity_id = "notarealid"
+        rv = self.client.get('/api/v1/amenities/{}'.format(amenity_id))
+        self.assertTrue(mock_api_storage.get.called)
+        self.assertEqual(mock_api_storage.get.call_args,
+                         (("Amenity", amenity_id),))
+        self.assertEqual(rv.status_code, 404)
+        self.assertEqual(json.loads(rv.get_data(as_text=True)),
+                         {"error": "Not found"})
+
+        a = self.Amenity()
+        mock_class_storage.reset_mock()
+        mock_api_storage.get.return_value = a
+        amenity_id = a.id
+        rv = self.client.get('/api/v1/amenities/{}'.format(amenity_id))
+        self.assertEqual(rv.status_code, 200)
+        self.assertTrue(mock_api_storage.get.called)
+        self.assertEqual(mock_api_storage.get.call_args,
+                         (("Amenity", amenity_id),))
+        self.assertEqual(json.loads(rv.get_data(as_text=True)),
+                         a.to_dict())
+
     def test_add_amenity(self, mock_class_storage, mock_api_storage):
         """Test route to create new amenity"""
         headers = {"Content-type": "application/json"}
@@ -99,9 +123,9 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertNotEqual(new_amty.get("created_at"), data.get("created_at"))
         self.assertNotEqual(new_amty.get("updated_at"), data.get("updated_at"))
 
-        data.update({"name": "Archimedes"})
+        data.update({"name": "Schleem"})
         mock_api_storage.all.return_value = {
-            "new_amenity": self.Amenity(name="Archimedes")
+            "new_amenity": self.Amenity(name="Schleem")
         }
         rv = self.client.post('/api/v1/amenities', headers=headers,
                               data=json.dumps(data))
@@ -111,3 +135,67 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertNotEqual(new_amty.get("id"), data.get("id"))
         self.assertNotEqual(new_amty.get("created_at"), data.get("created_at"))
         self.assertNotEqual(new_amty.get("updated_at"), data.get("updated_at"))
+
+    def test_delete_amenity(self, mock_class_storage, mock_api_storage):
+        """Test route to delete existing amenity"""
+        mock_api_storage.get.return_value = None
+        amenity_id = "notarealid"
+        rv = self.client.delete('/api/v1/amenities/{}'.format(amenity_id))
+        self.assertEqual(mock_api_storage.get.call_args,
+                         (("Amenity", amenity_id),))
+        self.assertEqual(rv.status_code, 404)
+        self.assertEqual(json.loads(rv.get_data(as_text=True)),
+                         {"error": "Not found"})
+
+        a = self.Amenity()
+        mock_class_storage.reset_mock()
+        mock_api_storage.get.return_value = a
+        amenity_id = a.id
+        rv = self.client.delete('/api/v1/amenities/{}'.format(amenity_id))
+        self.assertEqual(mock_api_storage.get.call_args,
+                         (("Amenity", amenity_id),))
+        self.assertEqual(rv.status_code, 200)
+        self.assertEqual(json.loads(rv.get_data(as_text=True)), {})
+        self.assertTrue(mock_class_storage.delete.called)
+        self.assertTrue(mock_api_storage.save.called)
+
+    def test_update_amenity(self, mock_class_storage, mock_api_storage):
+        """Test route to update amenity values"""
+        headers = {"Content-type": "application/json"}
+
+        mock_api_storage.get.return_value = None
+        amenity_id = "notarealid"
+        rv = self.client.put('/api/v1/amenities/{}'.format(amenity_id))
+        self.assertEqual(mock_api_storage.get.call_args,
+                         (("Amenity", amenity_id),))
+        self.assertEqual(rv.status_code, 404)
+        self.assertEqual(json.loads(rv.get_data(as_text=True)),
+                         {"error": "Not found"})
+
+        a = self.Amenity(name="Plumbus")
+        amenity_id = a.id
+        data = a.to_dict()
+        data.pop('__class__', None)
+        data.update({"name": "Shleem"})
+        data = json.dumps(data)
+
+        mock_api_storage.get.return_value = a
+        rv = self.client.put('/api/v1/amenities/{}'.format(amenity_id),
+                             data='{}')
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(json.loads(rv.get_data(as_text=True)),
+                         {'error': "Not a JSON"})
+
+        rv = self.client.put('/api/v1/amenities/{}'.format(amenity_id),
+                             headers=headers)
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(json.loads(rv.get_data(as_text=True)),
+                         {'error': "Not a JSON"})
+
+        mock_class_storage.reset_mock()
+        rv = self.client.put('/api/v1/amenities/{}'.format(amenity_id),
+                             headers=headers, data=data)
+        self.assertEqual(mock_api_storage.get.call_args,
+                         (("Amenity", amenity_id),))
+        self.assertTrue(mock_class_storage.save.called)
+        self.assertEqual(a.name, "Shleem")
