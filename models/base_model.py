@@ -4,6 +4,7 @@ Contains class BaseModel
 """
 import uuid
 import models
+from pprint import pprint
 from datetime import datetime
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.mysql import DATETIME
