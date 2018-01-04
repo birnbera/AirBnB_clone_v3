@@ -22,9 +22,6 @@ from unittest.mock import patch, Mock
 DBStorage = db_storage.DBStorage
 FileStorage = file_storage.FileStorage
 
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
-
 if os.getenv("HBNB_TYPE_STORAGE") == "db":
     StorageClass = DBStorage
 else:
