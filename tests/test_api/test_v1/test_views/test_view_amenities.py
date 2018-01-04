@@ -123,9 +123,9 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertNotEqual(new_amty.get("created_at"), data.get("created_at"))
         self.assertNotEqual(new_amty.get("updated_at"), data.get("updated_at"))
 
-        data.update({"name": "Schleem"})
+        data.update({"name": "Shleem"})
         mock_api_storage.all.return_value = {
-            "new_amenity": self.Amenity(name="Schleem")
+            "new_amenity": self.Amenity(name="Shleem")
         }
         rv = self.client.post('/api/v1/amenities', headers=headers,
                               data=json.dumps(data))
