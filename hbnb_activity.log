@@ -1,0 +1,10 @@
+2018-01-05 01:36:34,944 - INFO    - __init__   - <module>: Using sql storage instance
+2018-01-05 01:36:34,947 - INFO    - db_storage - __init__: DBStorage
+2018-01-05 01:36:34,947 - INFO    - db_storage - reload  : DBStorage
+2018-01-05 01:36:48,471 - INFO    - db_storage - new     : DBStorage
+2018-01-05 01:36:48,472 - INFO    - db_storage - get     : DBStorage
+2018-01-05 01:36:48,474 - INFO    - base_model - __init__: Created new instance of City
+2018-01-05 01:36:48,474 - INFO    - db_storage - new     : DBStorage
+2018-01-05 01:36:48,474 - INFO    - db_storage - get     : DBStorage
+2018-01-05 01:36:59,840 - INFO    - db_storage - new     : DBStorage
+2018-01-05 01:36:59,840 - INFO    - db_storage - get     : DBStorage

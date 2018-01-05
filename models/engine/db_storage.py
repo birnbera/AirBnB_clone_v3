@@ -3,10 +3,13 @@
 connection.
 """
 import json
+import logging
 from os import getenv
-from models import classes
+from models import Base, classes
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+
+log = logging.getLogger()
 
 
 class DBStorage:
@@ -40,8 +43,11 @@ class DBStorage:
             else:
                 Base.metadata.drop_all(self.__engine)
 
+        log.info("{}".format(self.__class__.__name__))
+
     def all(self, cls=None):
         """query on current db"""
+        log.info("{}".format(self.__class__.__name__))
         if not self.__session:
             self.reload()
         objects = {}
@@ -58,6 +64,7 @@ class DBStorage:
 
     def reload(self):
         """load all tables"""
+        log.info("{}".format(self.__class__.__name__))
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
@@ -68,6 +75,7 @@ class DBStorage:
 
     def reload_from_json(self):
         """deserializes the JSON file to __objects"""
+        log.warning("{}".format(self.__class__.__name__))
         def object_hook(o):
             if '__class__' in o:
                 oclass = o['__class__']
@@ -84,6 +92,7 @@ class DBStorage:
 
     def new(self, obj):
         """add the object to the current database session"""
+        log.info("{}".format(self.__class__.__name__))
         # if sl then only add if obj isnt in session
         # if db then add obj regardless into session
         if not self.get(obj.__class__.__name__, obj.id) or \
@@ -92,12 +101,14 @@ class DBStorage:
 
     def save(self):
         """commit all changes of the current database session"""
+        log.info("{}".format(self.__class__.__name__))
         self.__session.commit()
         if self.in_memory_db:
             self.save_to_json()
 
     def save_to_json(self):
         """serializes __objects to the JSON file (path: __file_path)"""
+        log.warning("{}".format(self.__class__.__name__))
         class MyEncoder(json.JSONEncoder):
             def default(self, o):
                 try:
@@ -110,6 +121,7 @@ class DBStorage:
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""
+        log.warning("{}".format(self.__class__.__name__))
         if not self.__session:
             self.reload()
         if obj:
@@ -117,15 +129,18 @@ class DBStorage:
 
     def close(self):
         """Dispose of current session if active"""
+        log.info("{}".format(self.__class__.__name__))
         self.__session.remove()
 
     def get(self, cls, id):
         """Retrieve object based on class name and id, else None
         if not found"""
+        log.info("{}".format(self.__class__.__name__))
         cls = classes.get(cls, None)
         return self.__session.query(cls).filter(cls.id == id).first() \
             if cls else None
 
     def count(self, cls=None):
         """Count number of objects in storage or number of type `cls`"""
+        log.info("{}".format(self.__class__.__name__))
         return len(self.all(cls))

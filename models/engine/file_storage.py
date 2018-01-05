@@ -3,7 +3,10 @@
 Contains the FileStorage class
 """
 import json
+import logging
 from models import classes
+
+log = logging.getLogger()
 
 
 class FileStorage:
@@ -23,15 +26,18 @@ class FileStorage:
         else:
             return {k: v for k, v in self.__objects.items()
                     if v.__class__ == cls}
+        log.info("{}".format(self.__class__.__name__))
 
     def new(self, obj):
         """sets in __objects the obj with key <obj class name>.id"""
+        log.info("{}".format(self.__class__.__name__))
         if obj is not None:
             key = obj.__class__.__name__ + "." + obj.id
             self.__objects[key] = obj
 
     def save(self):
         """serializes __objects to the JSON file (path: __file_path)"""
+        log.info("{}".format(self.__class__.__name__))
         class MyEncoder(json.JSONEncoder):
             def default(self, o):
                 try:
@@ -44,6 +50,7 @@ class FileStorage:
 
     def reload(self):
         """deserializes the JSON file to __objects"""
+        log.warning("{}".format(self.__class__.__name__))
         def object_hook(o):
             if '__class__' in o:
                 oclass = o['__class__']
@@ -59,21 +66,25 @@ class FileStorage:
 
     def delete(self, obj=None):
         """delete obj from __objects if it’s inside"""
+        log.warning("{}".format(self.__class__.__name__))
         if obj is not None:
             del self.__objects[obj.__class__.__name__ + '.' + obj.id]
             self.save()
 
     def close(self):
         """Deserialize JSON file to objects"""
+        log.info("{}".format(self.__class__.__name__))
         self.__objects.clear()
         self.reload()
 
     def get(self, cls, id):
         """Returns obj based on cls and id else None"""
+        log.info("{}".format(self.__class__.__name__))
         return self.__objects.get(cls + '.' + id, None) \
             if type(cls) == str and type(id) == str else None
 
     def count(self, cls=None):
         """Count number of objects in storage or specific number
         of cls objects"""
+        log.info("{}".format(self.__class__.__name__))
         return len(self.all(cls))

@@ -4,11 +4,13 @@ Contains class BaseModel
 """
 import uuid
 import models
+import logging
 from pprint import pprint
 from datetime import datetime
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.mysql import DATETIME
 
+log = logging.getLogger()
 time_fmt = "%Y-%m-%dT%H:%M:%S.%f"
 
 
@@ -31,6 +33,8 @@ class BaseModel:
             self.updated_at = datetime.strptime(self.updated_at, time_fmt)
         models.storage.new(self)
 
+        log.info("Created new instance of {}".format(self.__class__.__name__))
+
     def __str__(self):
         """String representation of the BaseModel class"""
         return "[{:s}] ({:s}) {}".format(self.__class__.__name__, self.id,
@@ -41,9 +45,11 @@ class BaseModel:
         self.updated_at = datetime.now()
         models.storage.new(self)
         models.storage.save()
+        log.info("{}".format(self.__class__.__name__))
 
     def to_dict(self, **kwargs):
         """returns a dictionary containing all keys/values of the instance"""
+        log.info("{}".format(self.__class__.__name__))
         new_dict = dict(list(filter(lambda i: not i[0].startswith('_'),
                                     vars(self).items())))
         if "created_at" in new_dict:
@@ -55,4 +61,5 @@ class BaseModel:
 
     def delete(self):
         """Delete current instance from storage by calling its delete method"""
+        log.info("{}".format(self.__class__.__name__))
         models.storage.delete(self)
