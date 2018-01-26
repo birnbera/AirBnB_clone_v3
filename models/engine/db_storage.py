@@ -4,7 +4,7 @@ connection.
 """
 import json
 from os import getenv
-from models import classes
+from models import Base, classes
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
