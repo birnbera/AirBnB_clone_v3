@@ -9,7 +9,7 @@ from os import getenv
 app = Flask('v1')
 app.url_map.strict_slashes = False
 app.register_blueprint(app_views)
-CORS(app, resources="/*", origins="0.0.0.0")
+CORS(app, resources=r"/api/v1/*", origins="*")
 
 
 @app.errorhandler(404)

@@ -31,7 +31,8 @@ class DBStorage:
                                           .format(user,
                                                   passwd,
                                                   host,
-                                                  database))
+                                                  database),
+                                          pool_pre_ping=True)
         if getenv('HBNB_ENV') == 'test':
             if database == 'hbnb_dev_db':
                 raise Exception("Using 'hbnb_dev_db' in 'test' mode. "
